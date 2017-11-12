@@ -73,16 +73,16 @@ class Board():
         print(self.board)
 
     def place(self, blox, x, y):
-        try:
-            self.is_allowed(blox, x, y)
-        except RuntimeError:
-            print("Illegal move")
+        if not self._is_allowed(blox, x, y):
+            raise RuntimeError("Illegal move")
         else:
             for index, val in np.ndenumerate(blox.body):
                 self.board[x + index[0]][y + index[1]] = val
             if self.first_move > 0:
                 self.first_move -= 1
 
-    def is_allowed(self, blox, x, y):
-
+    def _is_allowed(self, blox, y, x):
+        ly, lx = np.shape(blox.body)
+        if (x + lx > 13) or (y + ly > 13):
+            return False
         return True
