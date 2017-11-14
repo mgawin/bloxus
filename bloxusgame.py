@@ -1,4 +1,5 @@
 import numpy as np
+import io
 
 
 class Game():
@@ -24,13 +25,29 @@ class Player():
         self.name = name
         self.bloxs = []
         self.value = 0
-        self._add_blox(Blox([[0, 0], [0, id]], 1))
-        self._add_blox(Blox([[id, id, id, id]], 4))
-        self._add_blox(Blox([[0, id, 0, 0], [id, id, id, id]], 5))
+        self._add_blox("shapes.txt")
 
-    def _add_blox(self, blox):
-        self.value += blox.value
-        self.bloxs.append(blox)
+    def _add_blox(self, filename):
+        with open(filename, "r") as fp:
+            element = []
+            val = 0
+            lines = fp.readlines()
+            for line in lines:
+                if line.count("0") + line.count("1") + line.count("\n") != len(
+                        line):
+                    raise RuntimeError("Invalid block shapes file.")
+                if line[0] == "\n" or line.index == len(lines) - 1:
+                    self.bloxs.append(Blox(element, val))
+                    self.value += val
+                    element = []
+                    val = 0
+                    continue
+                val += line.count("1")
+                row = [int(i) for i in list(line.strip())]
+                element.append(row)
+            if len(element) > 0:
+                self.bloxs.append(Blox(element, val))
+                self.value += val
 
     def show(self):
         print("Player {}".format(self.name))
