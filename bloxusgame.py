@@ -74,7 +74,9 @@ class Blox():
 
     def show(self):
         print("** {}:".format(self.value))
-        print(self.body, "\n")
+        for row in self.body:
+            print("".join(str(int(i)) for i in row))
+        print("\n")
 
     def rotate(self):
         self.body = np.rot90(self.body)
@@ -89,7 +91,8 @@ class Board():
         self.moves_count = 0
 
     def show(self):
-        print(self.board)
+        for row in self.board:
+            print("".join(str(int(i)) for i in row))
 
     def place(self, blox, x, y):
         if not self._is_allowed(blox, x, y):
@@ -106,6 +109,8 @@ class Board():
         if self._overlaps_element(blox, x, y):
             return False
         if self._is_illegal_initial_move(blox, x, y):
+            return False
+        if self._is_not_touching(blox, x, y):
             return False
         return True
 
@@ -131,4 +136,7 @@ class Board():
             if not (self._covers_field(blox, x, y, 9, 6)
                     or self._covers_field(blox, x, y, 6, 9)):
                 return True
+        return False
+
+    def _is_not_touching(self, blox, x, y):
         return False
