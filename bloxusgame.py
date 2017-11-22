@@ -103,7 +103,7 @@ class Board():
             self.moves_count += 1
 
     def _is_allowed(self, blox, x, y):
-        ly, lx = np.shape(blox.body)
+        lx, ly = np.shape(blox.body)
         if (x + lx > 13) or (y + ly > 13):
             return False
         if self._overlaps_element(blox, x, y):
