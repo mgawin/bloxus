@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 
 
@@ -13,7 +15,7 @@ class Game():
         self.board.show()
 
     def move(self, blox, x, y):
-        self.board.place(blox, x, y)
+        self.board.place_blox(blox, x, y)
 
     def is_allowed(self, blox, x, y):
         self.board.is_allowed(blox, x, y)
@@ -94,13 +96,16 @@ class Board():
         for row in self.board:
             print("".join(str(int(i)) for i in row))
 
-    def place(self, blox, x, y):
+    def place_blox(self, blox, x, y):
         if not self._is_allowed(blox, x, y):
             raise RuntimeError("Illegal move")
         else:
-            for index, val in np.ndenumerate(blox.body):
-                self.board[x + index[0]][y + index[1]] = val
+            self._place(self.board, blox, x, y)
             self.moves_count += 1
+
+    def _place(self, board, blox, x, y):
+        for index, val in np.ndenumerate(blox.body):
+            board[x + index[0]][y + index[1]] = val
 
     def _is_allowed(self, blox, x, y):
         lx, ly = np.shape(blox.body)
@@ -110,7 +115,9 @@ class Board():
             return False
         if self._is_illegal_initial_move(blox, x, y):
             return False
-        if self._is_not_touching(blox, x, y):
+        if not self._is_adjacent_own_corner(blox, x, y):
+            return False
+        if self._is_adjacent_own_side(blox, x, y):
             return False
         return True
 
@@ -129,14 +136,48 @@ class Board():
         return False
 
     def _is_illegal_initial_move(self, blox, x, y):
-        print(self.moves_count)
-        blox.show()
-        print(x, y)
         if self.moves_count < 2:
-            if not (self._covers_field(blox, x, y, 9, 6)
-                    or self._covers_field(blox, x, y, 6, 9)):
+            if not (self._covers_field(blox, x, y, 4, 4)
+                    or self._covers_field(blox, x, y, 9, 9)):
                 return True
         return False
 
-    def _is_not_touching(self, blox, x, y):
+    def _is_adjacent_own_corner(self, blox, x, y):
+        if self.moves_count < 2:
+            return True
+        vboard = copy.deepcopy(self.board)
+        self._place(vboard, blox, x, y)
+        for index, val in np.ndenumerate(blox.body):
+            if val > 0:
+                if vboard[x + index[0] - 1][y + index[1] - 1] == val and \
+                        vboard[x + index[0] - 1][y + index[1]] == 0 and \
+                        vboard[x + index[0]][y + index[1] - 1] == 0:
+                    print(x + index[0] - 1, y + index[1])
+                    print(x + index[0], y + index[1] - 1)
+                    print(vboard[x + index[0] - 1][y + index[1]])
+                    print(vboard[x + index[0]][y + index[1] - 1])
+
+                    print("A")
+                    return True
+                if vboard[x + index[0] + 1][y + index[1] - 1] == val and \
+                        vboard[x + index[0]][y + index[1] - 1] == 0 and \
+                        vboard[x + index[0] + 1][y + index[1]] == 0:
+                    print("B")
+
+                    return True
+                if vboard[x + index[0] - 1][y + index[1] + 1] == val and \
+                        vboard[x + index[0] - 1][y + index[1]] == 0 and \
+                        vboard[x + index[0]][y + index[1] + 1] == 0:
+                    print("C")
+
+                    return True
+                if vboard[x + index[0] + 1][y + index[1] + 1] == val and \
+                        vboard[x + index[0]][y + index[1] + 1] == 0 and \
+                        vboard[x + index[0] + 1][y + index[1]] == 0:
+                    print("D")
+
+                    return True
+        return False
+
+    def _is_adjacent_own_side(self, blox, x, y):
         return False
