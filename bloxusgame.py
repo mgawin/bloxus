@@ -10,9 +10,10 @@ class Game():
         self.playerB = Player("B", 2)
 
     def show(self):
-        self.playerA.show()
-        self.playerB.show()
-        self.board.show()
+
+        return "\n**********************\nMove {}\n".format(
+            self.board.moves_count) + self.playerA.show() + self.playerB.show(
+        ) + self.board.show()
 
     def move(self, blox, x, y):
         self.board.place_blox(blox, x, y)
@@ -54,10 +55,11 @@ class Player():
                 self.value += val
 
     def show(self):
-        print("Player {}".format(self.name))
-        print("Hand value: {}".format(self.value))
+        s = ""
         for b in self.bloxs:
-            b.show()
+            s += b.show()
+        return "Player {}\n".format(self.name) + "Hand value: {}\n".format(
+            self.value) + s
 
     def rotate(self, i):
         self.bloxs[i].rotate()
@@ -78,10 +80,10 @@ class Blox():
         self.value = value
 
     def show(self):
-        print("** {}:".format(self.value))
+        s = ""
         for row in self.body:
-            print("".join(str(int(i)) for i in row))
-        print("\n")
+            s += "".join(str(int(i)) for i in row) + "\n"
+        return "** {}:\n".format(self.value) + s + "\n"
 
     def rotate(self):
         self.body = np.rot90(self.body)
@@ -96,8 +98,10 @@ class Board():
         self.moves_count = 0
 
     def show(self):
+        s = ""
         for row in self.board:
-            print("".join(str(int(i)) for i in row))
+            s += ("".join(str(int(i)) for i in row)) + "\n"
+        return s
 
     def place_blox(self, blox, x, y):
         if not self._is_allowed(blox, x, y):
@@ -155,8 +159,6 @@ class Board():
         #     print("".join(str(int(i)) for i in row))
         for index, val in np.ndenumerate(blox.body):
             if val > 0:
-                print("k")
-
                 if vboard[x + index[0] - 1][y + index[1] - 1] == val and \
                         vboard[x + index[0] - 1][y + index[1]] == 0 and \
                         vboard[x + index[0]][y + index[1] - 1] == 0:
