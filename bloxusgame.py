@@ -62,6 +62,9 @@ class Player():
     def rotate(self, i):
         self.bloxs[i].rotate()
 
+    def flip(self, i):
+        self.bloxs[i].flip()
+
     def put(self, i):
         blox = self.bloxs[i]
         self.bloxs.pop(i)
@@ -105,7 +108,8 @@ class Board():
 
     def _place(self, board, blox, x, y):
         for index, val in np.ndenumerate(blox.body):
-            board[x + index[0]][y + index[1]] = val
+            if val > 0:
+                board[x + index[0]][y + index[1]] = val
 
     def _is_allowed(self, blox, x, y):
         lx, ly = np.shape(blox.body)
@@ -147,35 +151,27 @@ class Board():
             return True
         vboard = copy.deepcopy(self.board)
         self._place(vboard, blox, x, y)
+        # for row in vboard:
+        #     print("".join(str(int(i)) for i in row))
         for index, val in np.ndenumerate(blox.body):
             if val > 0:
+                print("k")
+
                 if vboard[x + index[0] - 1][y + index[1] - 1] == val and \
                         vboard[x + index[0] - 1][y + index[1]] == 0 and \
                         vboard[x + index[0]][y + index[1] - 1] == 0:
-                    print(x + index[0] - 1, y + index[1])
-                    print(x + index[0], y + index[1] - 1)
-                    print(vboard[x + index[0] - 1][y + index[1]])
-                    print(vboard[x + index[0]][y + index[1] - 1])
-
-                    print("A")
                     return True
                 if vboard[x + index[0] + 1][y + index[1] - 1] == val and \
                         vboard[x + index[0]][y + index[1] - 1] == 0 and \
                         vboard[x + index[0] + 1][y + index[1]] == 0:
-                    print("B")
-
                     return True
                 if vboard[x + index[0] - 1][y + index[1] + 1] == val and \
                         vboard[x + index[0] - 1][y + index[1]] == 0 and \
                         vboard[x + index[0]][y + index[1] + 1] == 0:
-                    print("C")
-
                     return True
                 if vboard[x + index[0] + 1][y + index[1] + 1] == val and \
                         vboard[x + index[0]][y + index[1] + 1] == 0 and \
                         vboard[x + index[0] + 1][y + index[1]] == 0:
-                    print("D")
-
                     return True
         return False
 
