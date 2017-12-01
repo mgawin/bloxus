@@ -42,7 +42,22 @@ class TestStringMethods(unittest.TestCase):
         self.game.playerB.rotate(4)
         self.game.playerB.flip(4)
         self.game.move(self.game.playerB.put(4), 4, 6)
-        print(self.game.show())
+        print(self.game.board.show())
+        self.assertMultiLineEqual(self.game.board.show(
+        ), '''0000000000000
+0000000000000
+0000000000000
+0000000000000
+0000102200000
+0000011200000
+0000001200000
+0000001200000
+0000001022000
+0000110022000
+0000110200000
+0000222200000
+0000000000000
+''')
 
 
 if __name__ == '__main__':
