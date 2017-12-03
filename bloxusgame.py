@@ -5,12 +5,6 @@ import numpy as np
 
 
 class Game():
-    def __init__(self):
-        self.board = Board()
-        self.playerA = Player("A", 1)
-        self.playerB = Player("B", 2)
-        #self.next_A = bool(random.getrandbits(1))
-        self.next_A = True
 
     def show(self):
         if self.next_A:
@@ -22,6 +16,14 @@ class Game():
                 next) + self.playerA.show() + self.playerB.show(
         ) + self.board.show()
 
+    def __init__(self):
+        self.board = Board()
+        self.playerA = Player("A", 1)
+        self.playerB = Player("B", 2)
+        #self.next_A = bool(random.getrandbits(1))
+        self.next_A = True
+        self.game_state = [self.show()]
+
     def move(self, player, blox, x, y):
         correct_order = False
         if self.next_A and player is self.playerA:
@@ -31,6 +33,7 @@ class Game():
         if correct_order:
             self.board.place_blox(blox, x, y)
             self.next_A = not self.next_A
+            self.game_state.append(self.show())
         else:
             raise PermissionError("Wrong turn order!")
 
