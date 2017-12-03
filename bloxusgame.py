@@ -1,4 +1,5 @@
 import copy
+import random
 
 import numpy as np
 
@@ -8,15 +9,30 @@ class Game():
         self.board = Board()
         self.playerA = Player("A", 1)
         self.playerB = Player("B", 2)
+        #self.next_A = bool(random.getrandbits(1))
+        self.next_A = True
 
     def show(self):
-
+        if self.next_A:
+            next = "A"
+        else:
+            next = "B"
         return "\n**********************\nMove {}\n".format(
-            self.board.moves_count) + self.playerA.show() + self.playerB.show(
+            self.board.moves_count) + "Next to move: {}\n".format(
+                next) + self.playerA.show() + self.playerB.show(
         ) + self.board.show()
 
-    def move(self, blox, x, y):
-        self.board.place_blox(blox, x, y)
+    def move(self, player, blox, x, y):
+        correct_order = False
+        if self.next_A and player is self.playerA:
+            correct_order = True
+        if not self.next_A and player is self.playerB:
+            correct_order = True
+        if correct_order:
+            self.board.place_blox(blox, x, y)
+            self.next_A = not self.next_A
+        else:
+            raise PermissionError("Wrong turn order!")
 
     def is_allowed(self, blox, x, y):
         self.board.is_allowed(blox, x, y)
