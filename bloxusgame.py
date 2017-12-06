@@ -5,7 +5,6 @@ import numpy as np
 
 
 class Game():
-
     def show(self):
         if self.next_A:
             next = "A"
@@ -16,15 +15,21 @@ class Game():
                 next) + self.playerA.show() + self.playerB.show(
         ) + self.board.show()
 
-    def __init__(self):
+    def __init__(self, playerA, playerB):
         self.board = Board()
-        self.playerA = Player("A", 1)
-        self.playerB = Player("B", 2)
+        self.playerA = playerA
+        self.playerB = playerB
+        self.finished = False
         #self.next_A = bool(random.getrandbits(1))
         self.next_A = True
         self.game_state = [self.show()]
 
-    def move(self, player, blox, x, y):
+    def move(self, player, blox=None, x=None, y=None):
+
+        if blox is None:
+            move = player.getMove(self.board)
+            blox, x, y = move["blox"], move["x"], move["y"]
+
         correct_order = False
         if self.next_A and player is self.playerA:
             correct_order = True
@@ -42,12 +47,17 @@ class Game():
 
 
 class Player():
-    def __init__(self, name, id):
+    def __init__(self, name, id, strategy=None):
         self.name = name
         self.id = id
         self.bloxs = []
         self.value = 0
+        self.strategy = strategy
         self._add_blox("shapes.txt")
+
+    def getMove(self, board):
+
+        return self.strategy(board, self.bloxs, self.id)
 
     def _add_blox(self, filename):
         with open(filename, "r") as fp:

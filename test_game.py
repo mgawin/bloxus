@@ -1,5 +1,6 @@
 import unittest
 
+import bloxus_strategies as strat
 import bloxusgame as bg
 
 # game = bg.Game()
@@ -15,7 +16,7 @@ import bloxusgame as bg
 
 class TestStringMethods(unittest.TestCase):
     def test_invalid_move_touching_side(self):
-        self.game = bg.Game()
+        self.game = bg.Game(bg.Player("A", 1), bg.Player("B", 2))
         self.game.playerA.rotate(1)
         self.game.move(self.game.playerA, self.game.playerA.put(3), 3, 4)
         self.game.move(self.game.playerB, self.game.playerB.put(1), 9, 9)
@@ -27,7 +28,7 @@ class TestStringMethods(unittest.TestCase):
         )
 
     def test_invalid_move_initial_field(self):
-        self.game = bg.Game()
+        self.game = bg.Game(bg.Player("A", 1), bg.Player("B", 2))
         self.game.move(self.game.playerA, self.game.playerA.put(1), 4, 4)
         self.assertRaises(
             RuntimeError,
@@ -36,7 +37,7 @@ class TestStringMethods(unittest.TestCase):
         )
 
     def test_succesful_moves_sequence_and_game_show(self):
-        self.game = bg.Game()
+        self.game = bg.Game(bg.Player("A", 1), bg.Player("B", 2))
         self.game.move(self.game.playerA, self.game.playerA.put(1), 4, 4)
         self.game.move(self.game.playerB, self.game.playerB.put(4), 8, 8)
         self.game.playerA.rotate(2)
@@ -64,7 +65,7 @@ class TestStringMethods(unittest.TestCase):
 ''')
 
     def test_wrong_turn_order(self):
-        self.game = bg.Game()
+        self.game = bg.Game(bg.Player("A", 1), bg.Player("B", 2))
         self.game.playerA.rotate(1)
         self.game.move(self.game.playerA, self.game.playerA.put(3), 3, 4)
         self.game.move(self.game.playerB, self.game.playerB.put(1), 9, 9)
@@ -76,5 +77,4 @@ class TestStringMethods(unittest.TestCase):
         )
 
 
-if __name__ == '__main__':
-    unittest.main()
+unittest.main()
