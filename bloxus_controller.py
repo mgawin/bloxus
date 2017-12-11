@@ -11,6 +11,7 @@ def run():
             game.move(game.playerA)
         else:
             game.move(game.playerB)
+    print(game.show())
 
 
 if __name__ == '__main__':

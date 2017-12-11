@@ -1,8 +1,21 @@
-import bloxusgame
+import numpy as np
 
 
 def simple_strategy(board, bloxs, id):
-
-    selected_move = {"blox": bloxs[1], "x": 4, "y": 4}
-
-    return selected_move
+    selected_moves = []
+    for ix, blox in enumerate(bloxs):
+        #    print(blox.show())
+        for x in range(13):
+            for y in range(13):
+                #            print(x, y)
+                if board._is_allowed(blox, x, y):
+                    selected_moves.append({
+                        "blox": blox,
+                        "x": x,
+                        "y": y,
+                        "index": ix
+                    })
+    if len(selected_moves) > 0:
+        return selected_moves[0]
+    else:
+        return None

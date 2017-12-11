@@ -23,13 +23,20 @@ class Game():
         #self.next_A = bool(random.getrandbits(1))
         self.next_A = True
         self.game_state = [self.show()]
+        self.game_end = 0
 
     def move(self, player, blox=None, x=None, y=None):
 
         if blox is None:
             move = player.getMove(self.board)
-            blox, x, y = move["blox"], move["x"], move["y"]
-
+            if move:
+                blox, x, y = move["blox"], move["x"], move["y"]
+                self.game_end = 0
+            else:
+                self.game_end += 1
+                if self.game_end > 3:
+                    self.finished = True
+                return
         correct_order = False
         if self.next_A and player is self.playerA:
             correct_order = True
@@ -57,7 +64,13 @@ class Player():
 
     def getMove(self, board):
 
-        return self.strategy(board, self.bloxs, self.id)
+        move = self.strategy(board, self.bloxs, self.id)
+        if move:
+            i = move["index"]
+            blox = move["blox"]
+            self.bloxs.pop(i)
+            self.value -= blox.value
+        return move
 
     def _add_blox(self, filename):
         with open(filename, "r") as fp:
@@ -161,7 +174,8 @@ class Board():
     def _covers_field(self, blox, x, y, px, py):
         if (px < x or py < y):
             return False
-        if (px - x <= len(blox.body)) and (py - y <= len(blox.body[0])):
+        if (px - x + 1 <= len(blox.body)) and (py - y + 1 <= len(
+                blox.body[0])):
             return blox.body[px - x][py - y] > 0
 
     def _overlaps_element(self, blox, x, y):
@@ -182,12 +196,16 @@ class Board():
     def _is_adjacent_own_corner(self, blox, x, y):
         if self.moves_count < 2:
             return True
-        vboard = copy.deepcopy(self.board)
+        vboard = np.zeros((16, 16))
+        vboard[2:15, 2:15] = self.board
+        x = x + 2
+        y = y + 2
         self._place(vboard, blox, x, y)
-        # for row in vboard:
-        #     print("".join(str(int(i)) for i in row))
+        print(x, y)
+        print(len(vboard), len(vboard[0]))
         for index, val in np.ndenumerate(blox.body):
             if val > 0:
+                print(index[0], index[1])
                 if vboard[x + index[0] - 1][y + index[1] - 1] == val and \
                         vboard[x + index[0] - 1][y + index[1]] == 0 and \
                         vboard[x + index[0]][y + index[1] - 1] == 0:
