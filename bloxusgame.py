@@ -201,11 +201,8 @@ class Board():
         x = x + 2
         y = y + 2
         self._place(vboard, blox, x, y)
-        print(x, y)
-        print(len(vboard), len(vboard[0]))
         for index, val in np.ndenumerate(blox.body):
             if val > 0:
-                print(index[0], index[1])
                 if vboard[x + index[0] - 1][y + index[1] - 1] == val and \
                         vboard[x + index[0] - 1][y + index[1]] == 0 and \
                         vboard[x + index[0]][y + index[1] - 1] == 0:

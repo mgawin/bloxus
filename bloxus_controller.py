@@ -10,8 +10,10 @@ def run():
         if game.next_A:
             game.move(game.playerA)
         else:
+
             game.move(game.playerB)
-    print(game.show())
+        print(game.show())
+        input("press key")
 
 
 if __name__ == '__main__':

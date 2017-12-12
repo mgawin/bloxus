@@ -16,6 +16,7 @@ def simple_strategy(board, bloxs, id):
                         "index": ix
                     })
     if len(selected_moves) > 0:
+        print(selected_moves[0])
         return selected_moves[0]
     else:
         return None

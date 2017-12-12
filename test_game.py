@@ -64,9 +64,31 @@ class TestStringMethods(unittest.TestCase):
                 self.game.playerB, self.game.playerB.put(4), 9, 7)
         )
 
+    def test_invalid_move_touching_self2(self):
+        self.game = bg.Game(bg.Player("A", 1), bg.Player("B", 2))
+        self.game.move(self.game.playerA, self.game.playerA.put(2), 4, 4)
+        self.game.move(self.game.playerB, self.game.playerB.put(0), 8, 9)
+        self.assertRaises(
+            PermissionError,
+            lambda: self.game.move(
+                self.game.playerB, self.game.playerA.put(2), 3, 5)
+        )
 
-# def test_succesful_moves_3(self):
-#     self.game = bg.Game(bg.Player("A", 1), bg.Player("B", 2))
-#     self.game.move(self.game.playerA, self.game.playerA.put(0), 2, 1)
+    def test_invalid_move_touching_self3(self):
+        self.game = bg.Game(bg.Player("A", 1), bg.Player("B", 2))
+        self.game.move(self.game.playerA, self.game.playerA.put(0), 3, 2)
+        self.game.move(self.game.playerB, self.game.playerB.put(0), 8, 9)
+        self.game.move(self.game.playerA, self.game.playerA.put(0), 2, 2)
+        self.game.move(self.game.playerB, self.game.playerB.put(0), 7, 9)
+        self.game.move(self.game.playerA, self.game.playerA.put(0), 1, 3)
+        self.game.move(self.game.playerB, self.game.playerB.put(0), 6, 5)
+
+        print(self.game.show())
+        self.assertRaises(
+            PermissionError,
+            lambda: self.game.move(
+                self.game.playerA, self.game.playerA.put(0), 1, 4)
+        )
+
 
 unittest.main()
