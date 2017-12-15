@@ -222,4 +222,17 @@ class Board():
         return False
 
     def _is_adjacent_own_side(self, blox, x, y):
+        if self.moves_count < 2:
+            return False
+        vboard = np.zeros((16, 16))
+        vboard[2:15, 2:15] = self.board
+        x = x + 2
+        y = y + 2
+        for index, val in np.ndenumerate(blox.body):
+            if val > 0:
+                if vboard[x + index[0] - 1][y + index[1]] == val or \
+                        vboard[x + index[0]][y + index[1] - 1] == val or \
+                        vboard[x + index[0]][y + index[1] + 1] == val or \
+                        vboard[x + index[0]][y + index[1] + 1] == val:
+                    return True
         return False

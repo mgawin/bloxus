@@ -69,9 +69,9 @@ class TestStringMethods(unittest.TestCase):
         self.game.move(self.game.playerA, self.game.playerA.put(2), 4, 4)
         self.game.move(self.game.playerB, self.game.playerB.put(0), 8, 9)
         self.assertRaises(
-            PermissionError,
+            RuntimeError,
             lambda: self.game.move(
-                self.game.playerB, self.game.playerA.put(2), 3, 5)
+                self.game.playerA, self.game.playerA.put(2), 3, 5)
         )
 
     def test_invalid_move_touching_self3(self):
@@ -82,10 +82,8 @@ class TestStringMethods(unittest.TestCase):
         self.game.move(self.game.playerB, self.game.playerB.put(0), 7, 9)
         self.game.move(self.game.playerA, self.game.playerA.put(0), 1, 3)
         self.game.move(self.game.playerB, self.game.playerB.put(0), 6, 5)
-
-        print(self.game.show())
         self.assertRaises(
-            PermissionError,
+            RuntimeError,
             lambda: self.game.move(
                 self.game.playerA, self.game.playerA.put(0), 1, 4)
         )
