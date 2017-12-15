@@ -4,8 +4,8 @@ import bloxusgame as bg
 
 def run():
     game = bg.Game(
-        bg.Player("A", 1, strat.simple_strategy),
-        bg.Player("B", 2, strat.simple_strategy))
+        bg.Player("A", 1, strat.random_strategy),
+        bg.Player("B", 2, strat.random_strategy))
     while not game.finished:
         if game.next_A:
             game.move(game.playerA)
