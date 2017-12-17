@@ -6,7 +6,6 @@ def run():
     game = bg.Game(
         bg.Player("A", 1, strat.simple_strategy),
         bg.Player("B", 2, strat.random_strategy))
-    print(game.show())
     while not game.finished:
         if game.next_A:
             game.move(game.playerA)

@@ -1,6 +1,5 @@
 import unittest
 
-import bloxus_strategies as strat
 import bloxusgame as bg
 
 
@@ -27,22 +26,25 @@ class TestStringMethods(unittest.TestCase):
 
     def test_succesful_moves_sequence_and_game_show(self):
         self.game = bg.Game(bg.Player("A", 1), bg.Player("B", 2))
-        self.game.move(self.game.playerA, self.game.playerA.put(1), 4, 4)
-        self.game.move(self.game.playerB, self.game.playerB.put(4), 8, 8)
-        self.game.playerA.rotate(2)
-        self.game.move(self.game.playerA, self.game.playerA.put(2), 5, 5)
-        self.game.move(self.game.playerB, self.game.playerB.put(3), 10, 4)
-        self.game.move(self.game.playerA, self.game.playerA.put(2), 9, 4)
-        self.game.playerB.rotate(4)
-        self.game.playerB.flip(4)
-        self.game.move(self.game.playerB, self.game.playerB.put(4), 4, 6)
+        self.game.move(self.game.playerA, self.game.playerA.put(0), 4, 4)
+        self.game.move(self.game.playerB, self.game.playerB.put(7), 8, 8)
+        self.game.playerA.rotate(9)
+        self.game.playerA.rotate(9)
+        self.game.playerA.rotate(9)
+        self.game.playerA.flip(9)
+        self.game.move(self.game.playerA, self.game.playerA.put(9), 5, 5)
+        self.game.playerB.flip(9)
+        self.game.move(self.game.playerB, self.game.playerB.put(9), 10, 4)
+        self.game.move(self.game.playerA, self.game.playerA.put(6), 9, 4)
+        self.game.playerB.rotate(12)
+        self.game.move(self.game.playerB, self.game.playerB.put(12), 4, 7)
         self.assertEqual(len(self.game.game_state), 7)
         self.assertMultiLineEqual(self.game.board.show(), '''0000000000000
 0000000000000
 0000000000000
 0000000000000
-0000102200000
-0000011200000
+0000100200000
+0000011220000
 0000001200000
 0000001200000
 0000001022000
@@ -66,8 +68,9 @@ class TestStringMethods(unittest.TestCase):
 
     def test_invalid_move_touching_self2(self):
         self.game = bg.Game(bg.Player("A", 1), bg.Player("B", 2))
-        self.game.move(self.game.playerA, self.game.playerA.put(2), 4, 4)
-        self.game.move(self.game.playerB, self.game.playerB.put(0), 8, 9)
+        self.game.move(self.game.playerA, self.game.playerA.put(4), 4, 4)
+        self.game.move(self.game.playerB, self.game.playerB.put(6), 8, 9)
+        self.game.playerA.flip(9)
         self.assertRaises(
             RuntimeError,
             lambda: self.game.move(
@@ -76,16 +79,17 @@ class TestStringMethods(unittest.TestCase):
 
     def test_invalid_move_touching_self3(self):
         self.game = bg.Game(bg.Player("A", 1), bg.Player("B", 2))
-        self.game.move(self.game.playerA, self.game.playerA.put(0), 3, 2)
-        self.game.move(self.game.playerB, self.game.playerB.put(0), 8, 9)
+        self.game.move(self.game.playerA, self.game.playerA.put(6), 3, 2)
+        self.game.move(self.game.playerB, self.game.playerB.put(6), 8, 9)
         self.game.move(self.game.playerA, self.game.playerA.put(0), 2, 2)
         self.game.move(self.game.playerB, self.game.playerB.put(0), 7, 9)
-        self.game.move(self.game.playerA, self.game.playerA.put(0), 1, 3)
-        self.game.move(self.game.playerB, self.game.playerB.put(0), 6, 5)
+        self.game.move(self.game.playerA, self.game.playerA.put(3), 1, 3)
+        self.game.move(self.game.playerB, self.game.playerB.put(3), 6, 5)
+        self.game.playerA.flip(8)
         self.assertRaises(
             RuntimeError,
             lambda: self.game.move(
-                self.game.playerA, self.game.playerA.put(0), 1, 4)
+                self.game.playerA, self.game.playerA.put(8), 1, 4)
         )
 
 
