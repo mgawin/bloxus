@@ -1,7 +1,5 @@
 import random
 
-import numpy as np
-
 
 def simple_strategy(board, bloxs, id):
     selected_moves = _get_available_moves(board, bloxs)

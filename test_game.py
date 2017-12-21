@@ -38,7 +38,6 @@ class TestStringMethods(unittest.TestCase):
         self.game.move(self.game.playerA, self.game.playerA.put(6), 9, 4)
         self.game.playerB.rotate(12)
         self.game.move(self.game.playerB, self.game.playerB.put(12), 4, 7)
-        self.assertEqual(len(self.game.game_state), 7)
         self.assertMultiLineEqual(self.game.board.show(), '''0000000000000
 0000000000000
 0000000000000

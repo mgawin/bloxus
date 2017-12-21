@@ -1,7 +1,10 @@
 import copy
 import random
+import uuid
 
 import numpy as np
+
+import bloxusdb as db
 
 
 class Game():
@@ -22,7 +25,7 @@ class Game():
         self.finished = False
         #self.next_A = bool(random.getrandbits(1))
         self.next_A = True
-        self.game_state = [self.show()]
+        self.id = str(uuid.uuid4()).replace("-", "")
         self.game_end = 0
 
     def move(self, player, blox=None, x=None, y=None):
@@ -36,6 +39,7 @@ class Game():
                 self.game_end += 1
                 if self.game_end > 3:
                     self.finished = True
+                    db.store_game(self)
                 return
         correct_order = False
         if self.next_A and player is self.playerA:
@@ -45,7 +49,6 @@ class Game():
         if correct_order:
             self.board.place_blox(blox, x, y)
             self.next_A = not self.next_A
-            self.game_state.append(self.show())
         else:
             raise PermissionError("Wrong turn order!")
 

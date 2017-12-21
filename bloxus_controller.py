@@ -1,4 +1,5 @@
 import bloxus_strategies as strat
+import bloxusdb as db
 import bloxusgame as bg
 
 
@@ -14,7 +15,8 @@ def run():
 
     print(game.show())
     # input("press key")
+    print(db.get_games_stats())
 
 
-if __name__ == '__main__':
-    run()
+# if __name__ == '__init__main__':
+run()
