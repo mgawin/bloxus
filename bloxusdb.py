@@ -10,6 +10,9 @@ def store_game(game):
     record["playerA"]["name"] = game.playerA.name
     record["playerB"]["name"] = game.playerB.name
 
+    record["playerA"]["score"] = game.playerA.score
+    record["playerB"]["score"] = game.playerB.score
+
     db.insert(record)
     db.close()
 

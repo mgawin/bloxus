@@ -15,8 +15,9 @@ def run():
 
     print(game.show())
     # input("press key")
-    print(db.get_games_stats())
 
 
-# if __name__ == '__init__main__':
-run()
+if __name__ == '__main__':
+
+    for k in range(10):
+        run()

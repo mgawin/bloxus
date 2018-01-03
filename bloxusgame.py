@@ -39,6 +39,8 @@ class Game():
                 self.game_end += 1
                 if self.game_end > 3:
                     self.finished = True
+                    self.playerA.calculate_score()
+                    self.playerB.calculate_score()
                     db.store_game(self)
                 return
         correct_order = False
@@ -73,6 +75,7 @@ class Player():
             blox = move["blox"]
             self.bloxs.pop(i)
             self.value -= blox.value
+            self.last_value = blox.value
         return move
 
     def _add_blox(self, filename):
@@ -116,7 +119,15 @@ class Player():
         blox = self.bloxs[i]
         self.bloxs.pop(i)
         self.value -= blox.value
+        self.last_value = blox.value
         return blox
+
+    def calculate_score(self):
+        self.score = -1 * self.value
+        if self.score == 0:
+            self.score = 15
+            if self.last_value == 1:
+                self.score += 5
 
 
 class Blox():
