@@ -17,6 +17,28 @@ def random_strategy(board, bloxs, id):
         return None
 
 
+def random_bvalue_strategy(board, bloxs, id):
+    selected_moves = _get_available_moves(board, bloxs)
+    if len(selected_moves) > 0:
+        i = max(
+            range(len(selected_moves)),
+            key=lambda index: selected_moves[index]['blox'].value)
+        return selected_moves[i]
+    else:
+        return None
+
+
+def random_minval_strategy(board, bloxs, id):
+    selected_moves = _get_available_moves(board, bloxs)
+    if len(selected_moves) > 0:
+        i = min(
+            range(len(selected_moves)),
+            key=lambda index: selected_moves[index]['blox'].value)
+        return selected_moves[i]
+    else:
+        return None
+
+
 def _get_available_moves(board, bloxs):
     available_moves = []
     for ix, blox in enumerate(bloxs):

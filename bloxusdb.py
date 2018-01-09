@@ -1,4 +1,4 @@
-from tinydb import TinyDB
+from tinydb import TinyDB, where
 
 
 def store_game(game):
@@ -12,13 +12,38 @@ def store_game(game):
 
     record["playerA"]["score"] = game.playerA.score
     record["playerB"]["score"] = game.playerB.score
+    if game.playerA.score > game.playerB.score:
+        record["playerA"]["win"] = "Y"
+        record["playerB"]["win"] = "N"
+
+    elif game.playerB.score > game.playerA.score:
+        record["playerA"]["win"] = "N"
+        record["playerB"]["win"] = "Y"
+    else:
+        record["playerA"]["win"] = "Y"
+        record["playerB"]["win"] = "Y"
 
     db.insert(record)
     db.close()
 
 
-def get_games_stats():
-    db = TinyDB("./database/game_stats.json", create_dirs=True)
-    games = db.all()
+def get_strategy_win_stats(strat):
+    db = TinyDB("./database/game_stats.json", create_dirs=False)
+    games = db.search(where("playerB").strategy == strat)
+
+    games += db.search(where("playerA").strategy == strat)
+    win = 0
+    print(len(games))
+    for game in games:
+        if (game["playerA"]["win"] == "Y"
+                and game["playerA"]["strategy"] == strat) or (
+                    game["playerB"]["win"] == "Y"
+                    and game["playerB"]["strategy"] == strat):
+            win += 1
+    if len(games) > 0:
+        win_rate = win / len(games) * 100
+    else:
+        win_rate = 0
+    print(win)
+    print("Strategy {}:\nWins rate: {:6.2f}%".format(strat, win_rate))
     db.close()
-    return len(games)
