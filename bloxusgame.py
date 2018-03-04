@@ -23,26 +23,31 @@ class Game():
         self.playerA = playerA
         self.playerB = playerB
         self.finished = False
-        #self.next_A = bool(random.getrandbits(1))
+        # self.next_A = bool(random.getrandbits(1))
         self.next_A = True
         self.id = str(uuid.uuid4()).replace("-", "")
         self.game_end = 0
 
-    def move(self, player, blox=None, x=None, y=None):
-
-        if blox is None:
+    def move(self, player, move=None):
+        if move is None:
             move = player.getMove(self.board)
-            if move:
-                blox, x, y = move["blox"], move["x"], move["y"]
-                self.game_end = 0
-            else:
-                self.game_end += 1
-                if self.game_end > 3:
-                    self.finished = True
-                    self.playerA.calculate_score()
-                    self.playerB.calculate_score()
-                    db.store_game(self)
-                return
+        if move:
+            ix, x, y, rotates, flip = move["index"], move["x"], move[
+                "y"], move["rotates"], move["flip"]
+            blox = player.put(ix)
+            if rotates > 0:
+                blox.rotate(rotates)
+            if flip:
+                blox.flip()
+            self.game_end = 0
+        else:
+            self.game_end += 1
+            if self.game_end > 3:
+                self.finished = True
+                self.playerA.calculate_score()
+                self.playerB.calculate_score()
+                db.store_game(self)
+            return
         correct_order = False
         if self.next_A and player is self.playerA:
             correct_order = True
@@ -72,10 +77,7 @@ class Player():
         move = self.strategy(board, self.bloxs, self.id)
         if move:
             i = move["index"]
-            blox = move["blox"]
-            self.bloxs.pop(i)
-            self.value -= blox.value
-            self.last_value = blox.value
+        #    self.put(i)
         return move
 
     def _add_blox(self, filename):
@@ -141,8 +143,9 @@ class Blox():
             s += "".join(str(int(i)) for i in row) + "\n"
         return "** {}:\n".format(self.value) + s + "\n"
 
-    def rotate(self):
-        self.body = np.rot90(self.body)
+    def rotate(self, rotates=1):
+        for i in range(rotates):
+            self.body = np.rot90(self.body)
 
     def flip(self):
         self.body = np.fliplr(self.body)
@@ -161,6 +164,9 @@ class Board():
 
     def place_blox(self, blox, x, y):
         if not self._is_allowed(blox, x, y):
+            print(blox.show())
+            print(self.show())
+            print(x, y)
             raise RuntimeError("Illegal move")
         else:
             self._place(self.board, blox, x, y)
@@ -202,8 +208,8 @@ class Board():
 
     def _is_illegal_initial_move(self, blox, x, y):
         if self.moves_count < 2:
-            if not (self._covers_field(blox, x, y, 4, 4)
-                    or self._covers_field(blox, x, y, 9, 9)):
+            if not (self._covers_field(blox, x, y, 4, 4) or
+                    self._covers_field(blox, x, y, 9, 9)):
                 return True
         return False
 

@@ -33,17 +33,18 @@ def get_strategy_win_stats(strat):
 
     games += db.search(where("playerA").strategy == strat)
     win = 0
-    print(len(games))
     for game in games:
-        if (game["playerA"]["win"] == "Y"
-                and game["playerA"]["strategy"] == strat) or (
-                    game["playerB"]["win"] == "Y"
-                    and game["playerB"]["strategy"] == strat):
+        if (game["playerA"]["win"] == "Y" and
+            game["playerA"]["strategy"] == strat) or \
+            (game["playerB"]["win"] == "Y" and
+             game["playerB"]["strategy"] == strat):
             win += 1
+
     if len(games) > 0:
         win_rate = win / len(games) * 100
     else:
         win_rate = 0
-    print(win)
+
     print("Strategy {}:\nWins rate: {:6.2f}%".format(strat, win_rate))
+
     db.close()

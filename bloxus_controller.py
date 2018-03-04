@@ -5,8 +5,8 @@ import bloxusgame as bg
 
 def run():
     game = bg.Game(
-        bg.Player("A", 1, strat.random_bvalue_strategy),
-        bg.Player("B", 2, strat.random_minval_strategy))
+        bg.Player("A", 1, strat.random_bvalue_strategy_with_rotates),
+        bg.Player("B", 2, strat.random_strategy))
     while not game.finished:
         if game.next_A:
             game.move(game.playerA)
@@ -19,5 +19,5 @@ def run():
 
 if __name__ == '__main__':
 
-    for k in range(30):
+    for k in range(10):
         run()
