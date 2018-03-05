@@ -45,11 +45,18 @@ def random_minval_strategy(board, bloxs, id):
 def random_bvalue_strategy_with_rotates(board, bloxs, id):
     selected_moves = _get_available_moves(board, bloxs, True)
     if len(selected_moves) > 0:
-        i = max(
-            range(len(selected_moves)),
-            key=lambda index: selected_moves[index]['blox'].value)
-        del selected_moves[i]['blox']
-        return selected_moves[i]
+        # i = max(
+        #     range(len(selected_moves)),
+        #     key=lambda index: selected_moves[index]['blox'].value)
+        mx = max(selected_moves,
+                 key=lambda elem: elem['blox'].value)
+        best_moves = []
+        for k in range(len(selected_moves)):
+            if selected_moves[k]['blox'].value == mx['blox'].value:
+                best_moves.append(selected_moves[k])
+        i = random.randrange(len(best_moves))
+        del best_moves[i]['blox']
+        return best_moves[i]
     else:
         return None
 
