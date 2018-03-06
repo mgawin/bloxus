@@ -27,6 +27,13 @@ def store_game(game):
     db.close()
 
 
+def store_move(id, move):
+    move['gameId'] = id
+    db = TinyDB("./database/game_moves.json", create_dirs=True)
+    db.insert(move)
+    db.close()
+
+
 def get_strategy_win_stats(strat):
     db = TinyDB("./database/game_stats.json", create_dirs=False)
     games = db.search(where("playerB").strategy == strat)

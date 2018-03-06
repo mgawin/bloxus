@@ -69,7 +69,7 @@ def _get_available_moves(board, bloxs, rotate=False):
                 if board._is_allowed(blox, x, y):
                     available_moves.append({
                         "blox": blox,
-                        "index": ix,
+                        "id": blox.id,
                         "x": x,
                         "y": y,
                         "rotates": 0,
@@ -82,7 +82,7 @@ def _get_available_moves(board, bloxs, rotate=False):
                         if board._is_allowed(temp_blox, x, y):
                             available_moves.append({
                                 "blox": blox,
-                                "index": ix,
+                                "id": blox.id,
                                 "x": x,
                                 "y": y,
                                 "rotates": k,

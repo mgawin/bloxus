@@ -19,5 +19,5 @@ def run():
 
 if __name__ == '__main__':
 
-    for k in range(100):
+    for k in range(10):
         run()

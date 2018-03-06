@@ -26,15 +26,16 @@ class Game():
         # self.next_A = bool(random.getrandbits(1))
         self.next_A = True
         self.id = str(uuid.uuid4()).replace("-", "")
+
         self.game_end = 0
 
     def move(self, player, move=None):
         if move is None:
             move = player.getMove(self.board)
         if move:
-            ix, x, y, rotates, flip = move["index"], move["x"], move[
+            id, x, y, rotates, flip = move["id"], move["x"], move[
                 "y"], move["rotates"], move["flip"]
-            blox = player.put(ix)
+            blox = player.put(id)
             if rotates > 0:
                 blox.rotate(rotates)
             if flip:
@@ -56,6 +57,8 @@ class Game():
         if correct_order:
             self.board.place_blox(blox, x, y)
             self.next_A = not self.next_A
+            move['player'] = player.id
+            db.store_move(self.id, move)
         else:
             raise PermissionError("Wrong turn order!")
 
@@ -73,14 +76,10 @@ class Player():
         self._add_blox("shapes.txt")
 
     def getMove(self, board):
-
-        move = self.strategy(board, self.bloxs, self.id)
-        if move:
-            i = move["index"]
-        #    self.put(i)
-        return move
+        return self.strategy(board, self.bloxs, self.id)
 
     def _add_blox(self, filename):
+        blox_id = 0
         with open(filename, "r") as fp:
             element = []
             val = 0
@@ -89,8 +88,9 @@ class Player():
                         line):
                     raise RuntimeError("Invalid block shapes file.")
                 if line[0] == "\n":
-                    self.bloxs.append(Blox(element, val))
+                    self.bloxs.append(Blox(element, val, blox_id))
                     self.value += val
+                    blox_id += 1
                     element = []
                     val = 0
                     continue
@@ -101,8 +101,17 @@ class Player():
                 ]
                 element.append(row)
             if len(element) > 0:
-                self.bloxs.append(Blox(element, val))
+                self.bloxs.append(Blox(element, val, blox_id))
                 self.value += val
+                blox_id += 1
+
+    def get_blox(self, id):
+        for blox in self.bloxs:
+            if blox.id == id:
+                return blox
+                break
+
+        raise RuntimeError("Non-existing block id used.")
 
     def show(self):
         s = ""
@@ -111,15 +120,15 @@ class Player():
         return "Player {}\n".format(self.name) + "Hand value: {}\n".format(
             self.value) + s
 
-    def rotate(self, i):
-        self.bloxs[i].rotate()
+    def rotate(self, id):
+        self.get_blox(id).rotate()
 
-    def flip(self, i):
-        self.bloxs[i].flip()
+    def flip(self, id):
+        self.get_blox(id).flip()
 
-    def put(self, i):
-        blox = self.bloxs[i]
-        self.bloxs.pop(i)
+    def put(self, id):
+        blox = self.get_blox(id)
+        self.bloxs.remove(blox)
         self.value -= blox.value
         self.last_value = blox.value
         return blox
@@ -133,15 +142,16 @@ class Player():
 
 
 class Blox():
-    def __init__(self, shape, value):
+    def __init__(self, shape, value, id):
         self.body = np.array(shape)
         self.value = value
+        self.id = id
 
     def show(self):
         s = ""
         for row in self.body:
             s += "".join(str(int(i)) for i in row) + "\n"
-        return "** {}:\n".format(self.value) + s + "\n"
+        return "Id: {} Value: {}:\n".format(self.id, self.value) + s + "\n"
 
     def rotate(self, rotates=1):
         for i in range(rotates):
