@@ -29,6 +29,14 @@ class Game():
 
         self.game_end = 0
 
+    def get_player(self, id):
+        if self.playerA.id == id:
+            return self.playerA
+        elif self.playerB.id == id:
+            return self.playerB
+        else:
+            raise RuntimeError("Non-existing player id value.")
+
     def move(self, player, move=None):
         if move is None:
             move = player.getMove(self.board)
@@ -106,12 +114,7 @@ class Player():
                 blox_id += 1
 
     def get_blox(self, id):
-        for blox in self.bloxs:
-            if blox.id == id:
-                return blox
-                break
-
-        raise RuntimeError("Non-existing block id used.")
+        return resolve(self.bloxs, "id", id)
 
     def show(self):
         s = ""
@@ -266,3 +269,12 @@ class Board():
                         vboard[x + index[0]][y + index[1] + 1] == val:
                     return True
         return False
+
+
+def resolve(list, attribute, value):
+    for item in list:
+        if getattr(item, attribute) == value:
+            return item
+            break
+
+    raise RuntimeError("Non-existing attribute value.")

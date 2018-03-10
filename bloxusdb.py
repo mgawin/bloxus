@@ -55,3 +55,9 @@ def get_strategy_win_stats(strat):
     print("Strategy {}:\nWins rate: {:6.2f}%".format(strat, win_rate))
 
     db.close()
+
+
+def get_moves(id):
+    db = TinyDB("./database/game_moves.json", create_dirs=False)
+    games = db.search(where("gameId") == id)
+    return games
