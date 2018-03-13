@@ -1,8 +1,11 @@
 from tinydb import TinyDB, where
+import os.path
 
 
 def store_game(game):
-    db = TinyDB("./database/game_stats.json", create_dirs=True)
+    db_path = os.path.join(os.path.dirname(__file__),
+                           "./database/game_stats.json")
+    db = TinyDB(db_path, create_dirs=True)
     record = {"game": game.id}
     record["playerA"] = {"strategy": game.playerA.strategy.__name__}
     record["playerB"] = {"strategy": game.playerB.strategy.__name__}
@@ -29,13 +32,17 @@ def store_game(game):
 
 def store_move(id, move):
     move['gameId'] = id
-    db = TinyDB("./database/game_moves.json", create_dirs=True)
+    db_path = os.path.join(os.path.dirname(__file__),
+                           "./database/game_moves.json")
+    db = TinyDB(db_path, create_dirs=True)
     db.insert(move)
     db.close()
 
 
 def get_strategy_win_stats(strat):
-    db = TinyDB("./database/game_stats.json", create_dirs=False)
+    db_path = os.path.join(os.path.dirname(__file__),
+                           "./database/game_stats.json")
+    db = TinyDB(db_path, create_dirs=False)
     games = db.search(where("playerB").strategy == strat)
 
     games += db.search(where("playerA").strategy == strat)
@@ -58,6 +65,8 @@ def get_strategy_win_stats(strat):
 
 
 def get_moves(id):
-    db = TinyDB("./database/game_moves.json", create_dirs=False)
+    db_path = os.path.join(os.path.dirname(__file__),
+                           "./database/game_moves.json")
+    db = TinyDB(db_path, create_dirs=False)
     games = db.search(where("gameId") == id)
     return games

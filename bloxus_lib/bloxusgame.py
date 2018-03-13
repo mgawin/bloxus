@@ -3,6 +3,7 @@ import random
 import uuid
 import numpy as np
 import bloxusdb as db
+import os.path
 
 
 class Game():
@@ -102,7 +103,9 @@ class Player():
         self.bloxs = []
         self.value = 0
         self.strategy = strategy
-        self._add_blox("shapes.txt")
+        shape_path = os.path.join(
+            os.path.dirname(__file__), "./res/shapes.txt")
+        self._add_blox(shape_path)
 
     def getMove(self, board):
         return self.strategy(board, self.bloxs, self.id)
@@ -135,7 +138,7 @@ class Player():
                 blox_id += 1
 
     def get_blox(self, id):
-        return resolve(self.bloxs, "id", id)
+        return _resolve(self.bloxs, "id", id)
 
     def show(self):
         s = ""
@@ -303,7 +306,7 @@ class Board():
         return False
 
 
-def resolve(list, attribute, value):
+def _resolve(list, attribute, value):
     for item in list:
         if getattr(item, attribute) == value:
             return item
