@@ -13,8 +13,7 @@ def replay_game(id):
     k = "a"
     while k and i < len(moves):
         if k == "b":
-            game.undo_move()
-            if i > 0:
+            if game.undo_move():
                 i -= 1
         else:
             move = moves[i]

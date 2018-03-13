@@ -82,6 +82,9 @@ class Game():
             del self.move_history[0]
             player.get_back(blox)
             self.next_A = not self.next_A
+            return True
+
+        return False
 
     def is_allowed(self, blox, x, y):
         self.board.is_allowed(blox, x, y)
