@@ -1,9 +1,7 @@
 import copy
 import random
 import uuid
-
 import numpy as np
-
 import bloxusdb as db
 
 
@@ -26,8 +24,9 @@ class Game():
         # self.next_A = bool(random.getrandbits(1))
         self.next_A = True
         self.id = str(uuid.uuid4()).replace("-", "")
-
         self.game_end = 0
+        self.move_history = []
+        self.move_history_len = 40
 
     def get_player(self, id):
         if self.playerA.id == id:
@@ -67,11 +66,30 @@ class Game():
             self.next_A = not self.next_A
             move['player'] = player.id
             db.store_move(self.id, move)
+            self._add_to_history(
+                {"player_id": player.id, "blox": blox, "x": x, "y": y})
         else:
             raise PermissionError("Wrong turn order!")
 
+    def undo_move(self):
+        if len(self.move_history) > 0:
+            move = self.move_history[0]
+            player = self.get_player(move["player_id"])
+            blox = move["blox"]
+            x = move["x"]
+            y = move["y"]
+            self.board.remove_blox(blox, x, y)
+            del self.move_history[0]
+            player.get_back(blox)
+            self.next_A = not self.next_A
+
     def is_allowed(self, blox, x, y):
         self.board.is_allowed(blox, x, y)
+
+    def _add_to_history(self, move):
+        self.move_history.insert(0, move)
+        if len(self.move_history) > self.move_history_len:
+            del self.move_history[-1]
 
 
 class Player():
@@ -121,13 +139,7 @@ class Player():
         for b in self.bloxs:
             s += b.show()
         return "Player {}\n".format(self.name) + "Hand value: {}\n".format(
-            self.value) + s
-
-    def rotate(self, id):
-        self.get_blox(id).rotate()
-
-    def flip(self, id):
-        self.get_blox(id).flip()
+            self.value)
 
     def put(self, id):
         blox = self.get_blox(id)
@@ -135,6 +147,13 @@ class Player():
         self.value -= blox.value
         self.last_value = blox.value
         return blox
+
+    def get_back(self, blox):
+        self.bloxs.append(blox)
+        self.value += blox.value
+        if blox.flipped:
+            blox.flip()
+        blox.rotate(4 - blox.rotated)
 
     def calculate_score(self):
         self.score = -1 * self.value
@@ -149,6 +168,8 @@ class Blox():
         self.body = np.array(shape)
         self.value = value
         self.id = id
+        self.flipped = False
+        self.rotated = 0
 
     def show(self):
         s = ""
@@ -159,9 +180,11 @@ class Blox():
     def rotate(self, rotates=1):
         for i in range(rotates):
             self.body = np.rot90(self.body)
+        self.rotated = (self.rotated + rotates) % 4
 
     def flip(self):
         self.body = np.fliplr(self.body)
+        self.flip = not self.flip
 
 
 class Board():
@@ -189,6 +212,12 @@ class Board():
         for index, val in np.ndenumerate(blox.body):
             if val > 0:
                 board[x + index[0]][y + index[1]] = val
+
+    def remove_blox(self, blox, x, y):
+        for index, val in np.ndenumerate(blox.body):
+            if val > 0:
+                self.board[x + index[0]][y + index[1]] = 0
+        self.moves_count -= 1
 
     def _is_allowed(self, blox, x, y):
         lx, ly = np.shape(blox.body)

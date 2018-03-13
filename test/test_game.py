@@ -193,7 +193,6 @@ class TestStringMethods(unittest.TestCase):
             "rotates": 0,
             "flip": False
         })
-        self.game.playerA.flip(11)
         self.assertRaises(
             RuntimeError,
             lambda: self.game.move(
