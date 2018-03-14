@@ -1,7 +1,7 @@
 var app = angular.module('blockusApp', [])
-  .controller('GameController', ['$scope', 'backendService', function($scope, backendService) {
+  .controller('GameController', ['$scope', 'backendService', function ($scope, backendService) {
 
-    backendService.init().then(function(data) {
+    backendService.init().then(function (data) {
       $scope.gameId = data.gid;
       $scope.state = '0'
       $scope.blocked = true;
@@ -10,13 +10,13 @@ var app = angular.module('blockusApp', [])
       else $scope.blocks = data.game.PlayerB.Blocks;
 
       $scope.positionBlocks();
-      backendService.intervalRepeat(function() {
+      backendService.intervalRepeat(function () {
         return backendService.getStatus($scope.gameId, $scope.playerId, $scope.manageStatus)
       });
 
     });
 
-    $scope.$on('$destroy', function() {
+    $scope.$on('$destroy', function () {
       intervalPinging.stop();
     });
 
@@ -67,60 +67,60 @@ var app = angular.module('blockusApp', [])
 
 
 
-    $scope.manageStatus = function(promise) {
+    $scope.manageStatus = function (promise) {
 
-      promise.then(function(successResponse) {
-          console.log("Got game status code: " + successResponse.data.code);
-          if ($scope.state != successResponse.data.code) {
-            switch (successResponse.data.code) {
-              case '1':
-                $scope.blocked = true;
-                console.log("waiting");
-                break;
-              case '2':
-                console.log("Player A move");
-                if ($scope.playerId == 1) {
+      promise.then(function (successResponse) {
+        console.log("Got game status code: " + successResponse.data.code);
+        if ($scope.state != successResponse.data.code) {
+          switch (successResponse.data.code) {
+            case '1':
+              $scope.blocked = true;
+              console.log("waiting");
+              break;
+            case '2':
+              console.log("Player A move");
+              if ($scope.playerId == 1) {
 
-                  $scope.blocked = false;
-                  if (successResponse.data.lastmove) $scope.drawMove(successResponse.data.lastmove, '#B164DE');
+                $scope.blocked = false;
+                if (successResponse.data.lastmove) $scope.drawMove(successResponse.data.lastmove, '#B164DE');
 
-                }
-                else $scope.blocked = true;
+              }
+              else $scope.blocked = true;
 
-                break;
-              case '3':
-                console.log("Player B move");
-                if ($scope.playerId == 2) {
+              break;
+            case '3':
+              console.log("Player B move");
+              if ($scope.playerId == 2) {
 
-                  $scope.blocked = false;
-                  if (successResponse.data.lastmove) $scope.drawMove(successResponse.data.lastmove, 'orange');
+                $scope.blocked = false;
+                if (successResponse.data.lastmove) $scope.drawMove(successResponse.data.lastmove, 'orange');
 
-                }
-                else $scope.blocked = true;
+              }
+              else $scope.blocked = true;
 
 
-                break;
-
-            }
-
-            $scope.state = successResponse.data.code;
+              break;
 
           }
 
+          $scope.state = successResponse.data.code;
+
+        }
 
 
-        },
-        function(errorResponse) {
+
+      },
+        function (errorResponse) {
           console.log("Error: " + errorResponse.status + " " + errorResponse.statusText);
         })
 
     }
 
-    $scope.drawMove = function(move, color) {
+    $scope.drawMove = function (move, color) {
 
       var group = new paper.Group([]);
 
-      move.forEach(function(e) {
+      move.forEach(function (e) {
 
         x = parseInt(e[0]);
         y = parseInt(e[1]);
@@ -152,10 +152,10 @@ var app = angular.module('blockusApp', [])
     }
 
 
-    $scope.getMoves = function() {
+    $scope.getMoves = function () {
 
       $scope.allowed_moves = [];
-      backendService.getMoves($scope.gameId, $scope.playerId, selected.bid, selected.orientation_id).then(function(data) {
+      backendService.getMoves($scope.gameId, $scope.playerId, selected.bid, selected.orientation_id).then(function (data) {
         $scope.allowed_moves = data.moves;
 
       })
@@ -165,7 +165,7 @@ var app = angular.module('blockusApp', [])
 
 
 
-    $scope.doMove = function(x, y) {
+    $scope.doMove = function (x, y) {
 
       backendService.doMove($scope.gameId, $scope.playerId, selected.bid, selected.orientation_id, x, y)
       console.log("moved")
@@ -175,10 +175,10 @@ var app = angular.module('blockusApp', [])
     }
 
 
-    move_allowed = function(i, j) {
+    move_allowed = function (i, j) {
 
       var res = 0;
-      $scope.allowed_moves.forEach(function(e) {
+      $scope.allowed_moves.forEach(function (e) {
 
         n = parseInt(e[0]);
         m = parseInt(e[1]);
@@ -192,7 +192,7 @@ var app = angular.module('blockusApp', [])
     }
 
 
-    calculate_coords = function(val, horizontal) {
+    calculate_coords = function (val, horizontal) {
 
       if (horizontal) {
         return parseInt(Math.round((val - shiftx) / grid));
@@ -208,14 +208,14 @@ var app = angular.module('blockusApp', [])
     }
 
 
-    $scope.positionBlocks = function() {
+    $scope.positionBlocks = function () {
       var y = grid;
       var x = 450;
       var color;
       if ($scope.playerId == 1) color = 'orange';
       else color = '#B164DE';
 
-      $scope.blocks.forEach(function(element, index) {
+      $scope.blocks.forEach(function (element, index) {
         x = x + 120;
         if (x > 450 + 600) {
           x = 450 + 120;
@@ -260,7 +260,7 @@ var app = angular.module('blockusApp', [])
 
 
 
-        group.onMouseDown = function() {
+        group.onMouseDown = function () {
           console.log("down");
           if (this.locked || $scope.blocked) return;
 
@@ -286,7 +286,7 @@ var app = angular.module('blockusApp', [])
         };
 
 
-        group.onMouseDrag = function(event) {
+        group.onMouseDrag = function (event) {
           if (this.locked || $scope.blocked) return;
           this.position = event.point;
           if ((this.bounds.left <= 435) && (this.bounds.top <= 370) && (this.bounds.left > 86) && (this.bounds.top > 32)) {
@@ -301,7 +301,7 @@ var app = angular.module('blockusApp', [])
         };
 
 
-        group.onMouseUp = function() {
+        group.onMouseUp = function () {
           console.log("up");
           if ($scope.blocked) {
 

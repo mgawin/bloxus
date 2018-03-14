@@ -1,5 +1,3 @@
-import copy
-import random
 import uuid
 import numpy as np
 import bloxusdb as db
@@ -22,7 +20,6 @@ class Game():
         self.playerA = playerA
         self.playerB = playerB
         self.finished = False
-        # self.next_A = bool(random.getrandbits(1))
         self.next_A = True
         self.id = str(uuid.uuid4()).replace("-", "")
         self.game_end = 0
