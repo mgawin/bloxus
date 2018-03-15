@@ -10,3 +10,5 @@ database/
 .vscode
 .DS_Store
 db.sqlite3
+bloxus_server/api/migrations/
+bloxus_server/db.sqlite3

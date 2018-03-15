@@ -1,6 +1,6 @@
 import uuid
 import numpy as np
-import bloxusdb as db
+from bloxus_lib import bloxusdb as db
 import os.path
 
 

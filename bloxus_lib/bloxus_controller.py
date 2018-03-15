@@ -1,6 +1,5 @@
 import bloxus_strategies as strat
-import bloxusdb as db
-import bloxusgame as bg
+from bloxus_lib import bloxusgame as bg
 
 
 def run():
