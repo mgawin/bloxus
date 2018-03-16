@@ -11,10 +11,13 @@ from django.db import transaction
 def init(request):
     if request.method != 'POST':
         return HttpResponseBadRequest()
+    name = request.POST.get('Name')
     with transaction.atomic():
         wg = WaitingGame.objects.select_for_update().get(id=1)
         if wg.gid == "0000":
-            player = bg.Player("A", 1)
+            if name is None:
+                name = "Player A"
+            player = bg.Player(name, 1)
             game = bg.Game(player)
             wg.gid = game.id
             gid = game.id
@@ -26,7 +29,9 @@ def init(request):
         else:
             ser_game = get_object_or_404(Game, pk=wg.gid)
             game = dill.loads(bytes.fromhex(ser_game.persisted_game))
-            player = bg.Player("B", 2)
+            if name is None:
+                name = "Player B"
+            player = bg.Player(name, 2)
             game.add_player(player)
             gid = wg.gid
             wg.gid = "0000"
