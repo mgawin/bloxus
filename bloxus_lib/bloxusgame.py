@@ -2,6 +2,7 @@ import uuid
 import numpy as np
 from bloxus_lib import bloxusdb as db
 import os.path
+from enum import Enum
 
 
 class Game():
@@ -15,16 +16,27 @@ class Game():
                 next) + self.playerA.show() + self.playerB.show(
         ) + self.board.show()
 
-    def __init__(self, playerA, playerB):
+    def __init__(self, playerA=None, playerB=None):
         self.board = Board()
+        self.state = GameState.WAITING
         self.playerA = playerA
         self.playerB = playerB
-        self.finished = False
-        self.next_A = True
         self.id = str(uuid.uuid4()).replace("-", "")
         self.game_end = 0
         self.move_history = []
         self.move_history_len = 40
+        if (playerA and playerB) is not None:
+            self.state = GameState.PLAYER_A
+
+    def add_player(self, player):
+        if self.state != GameState.WAITING:
+            raise RuntimeError("Invalid action. Game in progress!")
+        if self.playerA is None:
+            self.playerA = player
+        else:
+            self.playerB = player
+        if (self.playerA and self.playerB) is not None:
+            self.state = GameState.PLAYER_A
 
     def get_player(self, id):
         if self.playerA.id == id:
@@ -35,6 +47,8 @@ class Game():
             raise RuntimeError("Non-existing player id value.")
 
     def move(self, player, move=None):
+        if (self.state != GameState.PLAYER_A) and (self.state != GameState.PLAYER_B):
+            raise RuntimeError("Invalid action. Game not in progress.")
         if move is None:
             move = player.getMove(self.board)
         if move:
@@ -49,19 +63,22 @@ class Game():
         else:
             self.game_end += 1
             if self.game_end > 3:
-                self.finished = True
+                self.state = GameState.FINISHED
                 self.playerA.calculate_score()
                 self.playerB.calculate_score()
                 db.store_game(self)
             return
         correct_order = False
-        if self.next_A and player is self.playerA:
+        if self.state == GameState.PLAYER_A and player is self.playerA:
             correct_order = True
-        if not self.next_A and player is self.playerB:
+        if self.state == GameState.PLAYER_B and player is self.playerB:
             correct_order = True
         if correct_order:
             self.board.place_blox(blox, x, y)
-            self.next_A = not self.next_A
+            if self.state == GameState.PLAYER_A:
+                self.state = GameState.PLAYER_B
+            elif self.state == GameState.PLAYER_B:
+                self.state = GameState.PLAYER_A
             move['player'] = player.id
             db.store_move(self.id, move)
             self._add_to_history(
@@ -70,6 +87,8 @@ class Game():
             raise PermissionError("Wrong turn order!")
 
     def undo_move(self):
+        if (self.state != GameState.PLAYER_A) and (self.state != GameState.PLAYER_B):
+            raise RuntimeError("Invalid action. Game not in progress.")
         if len(self.move_history) > 0:
             move = self.move_history[0]
             player = self.get_player(move["player_id"])
@@ -79,7 +98,10 @@ class Game():
             self.board.remove_blox(blox, x, y)
             del self.move_history[0]
             player.get_back(blox)
-            self.next_A = not self.next_A
+            if self.state == GameState.PLAYER_A:
+                self.state = GameState.PLAYER_B
+            elif self.state == GameState.PLAYER_B:
+                self.state = GameState.PLAYER_A
             return True
 
         return False
@@ -310,3 +332,10 @@ def _resolve(list, attribute, value):
             break
 
     raise RuntimeError("Non-existing attribute value.")
+
+
+class GameState(Enum):
+    WAITING = 1
+    PLAYER_A = 2
+    PLAYER_B = 3
+    FINISHED = 4
