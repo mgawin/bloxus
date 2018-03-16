@@ -2,7 +2,7 @@ import uuid
 import numpy as np
 from bloxus_lib import bloxusdb as db
 import os.path
-from enum import Enum
+from enum import IntEnum
 
 
 class Game():
@@ -334,7 +334,7 @@ def _resolve(list, attribute, value):
     raise RuntimeError("Non-existing attribute value.")
 
 
-class GameState(Enum):
+class GameState(IntEnum):
     WAITING = 1
     PLAYER_A = 2
     PLAYER_B = 3
