@@ -166,6 +166,14 @@ class Player():
         return "Player {}\n".format(self.name) + "Hand value: {}\n".format(
             self.value)
 
+    def input_for_JSON(self):
+        obj = {"name": self.name, "pid": self.id}
+        bloxs_obj = []
+        for blox in self.bloxs:
+            bloxs_obj.append(blox.input_for_JSON())
+        obj["bloxs"] = bloxs_obj
+        return obj
+
     def put(self, id):
         blox = self.get_blox(id)
         self.bloxs.remove(blox)
@@ -201,6 +209,12 @@ class Blox():
         for row in self.body:
             s += "".join(str(int(i)) for i in row) + "\n"
         return "Id: {} Value: {}:\n".format(self.id, self.value) + s + "\n"
+
+    def input_for_JSON(self):
+        shape = []
+        for row in self.body:
+            shape.append([int(i) for i in row])
+        return {'shp': shape, 'bid': self.id}
 
     def rotate(self, rotates=1):
         for i in range(rotates):

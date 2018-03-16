@@ -14,10 +14,10 @@ def init(request):
     with transaction.atomic():
         wg = WaitingGame.objects.select_for_update().get(id=1)
         if wg.gid == "0000":
-            game = bg.Game(bg.Player("A", 1))
+            player = bg.Player("A", 1)
+            game = bg.Game(player)
             wg.gid = game.id
             gid = game.id
-            pid = 1
             wg.save()
             ser_game = Game()
             ser_game.id = game.id
@@ -26,14 +26,14 @@ def init(request):
         else:
             ser_game = get_object_or_404(Game, pk=wg.gid)
             game = dill.loads(bytes.fromhex(ser_game.persisted_game))
-            game.add_player(bg.Player("B", 2))
+            player = bg.Player("B", 2)
+            game.add_player(player)
             gid = wg.gid
             wg.gid = "0000"
             wg.save()
-            pid = 2
             ser_game.persisted_game = dill.dumps(game).hex()
             ser_game.save()
-    return JsonResponse({"gid": gid, "pid": pid})
+    return JsonResponse({"gid": gid, "player": player.input_for_JSON()})
 
 
 @csrf_exempt
