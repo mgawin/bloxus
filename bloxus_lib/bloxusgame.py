@@ -41,8 +41,9 @@ class Game():
     def get_player(self, id):
         if self.playerA.id == id:
             return self.playerA
-        elif self.playerB.id == id:
-            return self.playerB
+        if self.playerB is not None:
+            if self.playerB.id == id:
+                return self.playerB
         else:
             raise RuntimeError("Non-existing player id value.")
 
@@ -106,8 +107,14 @@ class Game():
 
         return False
 
-    def is_allowed(self, blox, x, y):
-        self.board.is_allowed(blox, x, y)
+    def is_allowed(self, player, move):
+        id, x, y, rotates, flip = move["id"], move["x"], move["y"], move["rotates"], move["flip"]
+        blox = player.get_blox(id)
+        if rotates > 0:
+            blox.rotate(rotates)
+        if flip:
+            blox.flip()
+        return self.board._is_allowed(blox, x, y)
 
     def _add_to_history(self, move):
         self.move_history.insert(0, move)

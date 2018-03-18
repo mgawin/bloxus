@@ -5,6 +5,7 @@ import dill
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+import ast
 
 
 @csrf_exempt
@@ -45,7 +46,36 @@ def init(request):
 def get(request):
     if request.method != 'GET':
         return HttpResponseBadRequest()
-    id = request.GET.get('id')
-    ser_game = get_object_or_404(Game, pk=id)
+    gid = request.GET.get('gid')
+    print(gid)
+    ser_game = get_object_or_404(Game, pk=gid)
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
+    return JsonResponse({"status": game.state})
+
+
+@csrf_exempt
+def check_move(request):
+    if request.method != 'POST':
+        return HttpResponseBadRequest()
+    gid = request.POST.get('gid')
+    ser_game = get_object_or_404(Game, pk=gid)
+    pid = request.POST.get('pid')
+    move = ast.literal_eval(request.POST.get('mov'))
+    game = dill.loads(bytes.fromhex(ser_game.persisted_game))
+    res = game.is_allowed(game.get_player(int(pid)), move)
+    return JsonResponse({"allowed": res})
+
+
+@csrf_exempt
+def move(request):
+    if request.method != 'POST':
+        return HttpResponseBadRequest()
+    gid = request.POST.get('gid')
+    ser_game = get_object_or_404(Game, pk=gid)
+    pid = request.POST.get('pid')
+    move = ast.literal_eval(request.POST.get('mov'))
+    game = dill.loads(bytes.fromhex(ser_game.persisted_game))
+    game.move(game.get_player(int(pid)), move)
+    ser_game.persisted_game = dill.dumps(game).hex()
+    ser_game.save()
     return JsonResponse({"status": game.state})
