@@ -10,9 +10,9 @@ import ast
 
 @csrf_exempt
 def init(request):
-    if request.method != 'POST':
+    if not _verify_request_params(request, ["name"], "POST"):
         return HttpResponseBadRequest()
-    name = request.POST.get('Name')
+    name = request.POST.get('name')
     with transaction.atomic():
         wg = WaitingGame.objects.select_for_update().get(id=1)
         if wg.gid == "0000":
@@ -44,10 +44,9 @@ def init(request):
 
 @csrf_exempt
 def get(request):
-    if request.method != 'GET':
+    if not _verify_request_params(request, ["gid"], "GET"):
         return HttpResponseBadRequest()
     gid = request.GET.get('gid')
-    print(gid)
     ser_game = get_object_or_404(Game, pk=gid)
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
     return JsonResponse({"status": game.state})
@@ -55,7 +54,7 @@ def get(request):
 
 @csrf_exempt
 def check_move(request):
-    if request.method != 'POST':
+    if not _verify_request_params(request, ["gid", "pid", "mov"], "POST"):
         return HttpResponseBadRequest()
     gid = request.POST.get('gid')
     ser_game = get_object_or_404(Game, pk=gid)
@@ -68,7 +67,7 @@ def check_move(request):
 
 @csrf_exempt
 def move(request):
-    if request.method != 'POST':
+    if not _verify_request_params(request, ["gid", "pid", "mov"], "POST"):
         return HttpResponseBadRequest()
     gid = request.POST.get('gid')
     ser_game = get_object_or_404(Game, pk=gid)
@@ -79,3 +78,19 @@ def move(request):
     ser_game.persisted_game = dill.dumps(game).hex()
     ser_game.save()
     return JsonResponse({"status": game.state})
+
+
+def _verify_request_params(request, params, method):
+    if request.method != method:
+        return False
+    if method == 'POST':
+        data = request.POST
+    elif method == 'GET':
+        data = request.GET
+    for param in params:
+        if param not in data:
+            return False
+        else:
+            if data.get(param) is None or data.get(param) == "":
+                return False
+    return True
