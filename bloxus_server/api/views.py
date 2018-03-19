@@ -28,8 +28,6 @@ def init(request):
         with transaction.atomic():
             wg = WaitingGame.objects.select_for_update().get(id=1)
             if wg.gid == "0000":
-                if name is None:
-                    name = "Player A"
                 player = bg.Player(name, 1)
                 game = bg.Game(player)
                 wg.gid = game.id
@@ -42,8 +40,6 @@ def init(request):
             else:
                 ser_game = get_object_or_404(Game, pk=wg.gid)
                 game = dill.loads(bytes.fromhex(ser_game.persisted_game))
-                if name is None:
-                    name = "Player B"
                 player = bg.Player(name, 2)
                 game.add_player(player)
                 gid = wg.gid
