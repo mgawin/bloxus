@@ -56,6 +56,8 @@ class Game():
             id, x, y, rotates, flip = move["id"], move["x"], move[
                 "y"], move["rotates"], move["flip"]
             blox = player.put(id)
+            if blox is None:
+                raise RuntimeError("Non-existing blox id value.")
             if rotates > 0:
                 blox.rotate(rotates)
             if flip:
@@ -110,6 +112,8 @@ class Game():
     def is_allowed(self, player, move):
         id, x, y, rotates, flip = move["id"], move["x"], move["y"], move["rotates"], move["flip"]
         blox = player.get_blox(id)
+        if blox is None:
+            return False
         if rotates > 0:
             blox.rotate(rotates)
         if flip:
@@ -183,9 +187,10 @@ class Player():
 
     def put(self, id):
         blox = self.get_blox(id)
-        self.bloxs.remove(blox)
-        self.value -= blox.value
-        self.last_value = blox.value
+        if blox is not None:
+            self.bloxs.remove(blox)
+            self.value -= blox.value
+            self.last_value = blox.value
         return blox
 
     def get_back(self, blox):
@@ -243,6 +248,9 @@ class Board():
         for row in self.board:
             s += ("".join(str(int(i)) for i in row)) + "\n"
         return s
+
+    def input_for_JSON(self):
+        return self.board.tolist()
 
     def place_blox(self, blox, x, y):
         if not self._is_allowed(blox, x, y):
@@ -352,7 +360,7 @@ def _resolve(list, attribute, value):
             return item
             break
 
-    raise RuntimeError("Non-existing attribute value.")
+    return None
 
 
 class GameState(IntEnum):

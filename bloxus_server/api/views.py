@@ -21,6 +21,7 @@ def init(request):
         game = bg.Game(player, robot_player)
         ser_game = Game()
         ser_game.id = game.id
+        ser_game.robot_game = True
         gid = game.id
         ser_game.persisted_game = dill.dumps(game).hex()
         ser_game.save()
@@ -57,7 +58,7 @@ def get(request):
     gid = request.GET.get('gid')
     ser_game = get_object_or_404(Game, pk=gid)
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
-    return JsonResponse({"status": game.state})
+    return JsonResponse({"status": game.state, "board": game.board.input_for_JSON()})
 
 
 @csrf_exempt
@@ -82,10 +83,18 @@ def move(request):
     pid = request.POST.get('pid')
     move = ast.literal_eval(request.POST.get('mov'))
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
-    game.move(game.get_player(int(pid)), move)
+    try:
+        game.move(game.get_player(int(pid)), move)
+    except RuntimeError:
+        return HttpResponseBadRequest()
+    if ser_game.robot_game:
+        try:
+            game.move(game.get_player(2))
+        except RuntimeError:
+            return HttpResponseBadRequest()
     ser_game.persisted_game = dill.dumps(game).hex()
     ser_game.save()
-    return JsonResponse({"status": game.state})
+    return JsonResponse({"status": game.state, "board": game.board.input_for_JSON()})
 
 
 def _verify_request_params(request, params, method):
