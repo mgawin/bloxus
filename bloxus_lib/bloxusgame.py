@@ -3,6 +3,7 @@ import numpy as np
 from bloxus_lib import bloxusdb as db
 import os.path
 from enum import IntEnum
+import copy
 
 
 class Game():
@@ -240,7 +241,7 @@ class Blox():
 
 class Board():
     def __init__(self):
-        self.board = np.zeros((13, 13))
+        self.board = np.zeros((14, 14))
         self.moves_count = 0
 
     def show(self):
@@ -273,9 +274,20 @@ class Board():
                 self.board[x + index[0]][y + index[1]] = 0
         self.moves_count -= 1
 
+    def get_available_moves(self, blox, rotates):
+        available_moves = []
+        temp_blox = copy.deepcopy(blox)
+        for k in range(rotates):
+            temp_blox.rotate()
+        for x in range(13):
+            for y in range(13):
+                if self._is_allowed(temp_blox, x, y):
+                    available_moves.append([x, y])
+        return available_moves
+
     def _is_allowed(self, blox, x, y):
         lx, ly = np.shape(blox.body)
-        if (x + lx > 13) or (y + ly > 13):
+        if (x + lx > 14) or (y + ly > 14):
             return False
         if self._overlaps_element(blox, x, y):
             return False
@@ -313,7 +325,7 @@ class Board():
         if self.moves_count < 2:
             return True
         vboard = np.zeros((16, 16))
-        vboard[2:15, 2:15] = self.board
+        vboard[2:16, 2:16] = self.board
         x = x + 2
         y = y + 2
         self._place(vboard, blox, x, y)
@@ -341,7 +353,7 @@ class Board():
         if self.moves_count < 2:
             return False
         vboard = np.zeros((16, 16))
-        vboard[2:15, 2:15] = self.board
+        vboard[2:16, 2:16] = self.board
         x = x + 2
         y = y + 2
         for index, val in np.ndenumerate(blox.body):
