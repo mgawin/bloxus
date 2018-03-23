@@ -90,11 +90,29 @@ def move(request):
     if ser_game.robot_game:
         try:
             game.move(game.get_player(2))
+            last_move = game.get_last_move()
         except RuntimeError:
             return HttpResponseBadRequest()
     ser_game.persisted_game = dill.dumps(game).hex()
     ser_game.save()
-    return JsonResponse({"status": game.state, "board": game.board.input_for_JSON()})
+    print(last_move)
+    return JsonResponse({"status": game.state, "board": game.board.input_for_JSON(), "last": last_move})
+
+
+@csrf_exempt
+def get_available_moves(request):
+    if not _verify_request_params(request, ["gid", "pid", "bid", "rotates"], "POST"):
+        return HttpResponseBadRequest()
+    gid = request.POST.get('gid')
+    ser_game = get_object_or_404(Game, pk=gid)
+    pid = request.POST.get('pid')
+    bid = request.POST.get('bid')
+    rotates = request.POST.get('rotates')
+    game = dill.loads(bytes.fromhex(ser_game.persisted_game))
+
+    moves = game.board.get_available_moves(game.get_player(
+        int(pid)).get_blox(int(bid)), rotates=int(rotates))
+    return JsonResponse({"moves": moves})
 
 
 def _verify_request_params(request, params, method):

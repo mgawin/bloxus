@@ -39,6 +39,15 @@ class Game():
         if (self.playerA and self.playerB) is not None:
             self.state = GameState.PLAYER_A
 
+    def get_last_move(self):
+        last_move = {}
+        if self.move_history[0] is not None:
+            last_move["blox"] = self.move_history[0]["blox"].input_for_JSON()
+            last_move["pid"] = self.move_history[0]["player_id"]
+            last_move["x"] = self.move_history[0]["x"]
+            last_move["y"] = self.move_history[0]["y"]
+        return last_move
+
     def get_player(self, id):
         if self.playerA.id == id:
             return self.playerA
@@ -279,15 +288,15 @@ class Board():
         temp_blox = copy.deepcopy(blox)
         for k in range(rotates):
             temp_blox.rotate()
-        for x in range(13):
-            for y in range(13):
+        for x in range(14):
+            for y in range(14):
                 if self._is_allowed(temp_blox, x, y):
                     available_moves.append([x, y])
         return available_moves
 
     def _is_allowed(self, blox, x, y):
         lx, ly = np.shape(blox.body)
-        if (x + lx > 14) or (y + ly > 14):
+        if (x + lx > 13) or (y + ly > 13):
             return False
         if self._overlaps_element(blox, x, y):
             return False

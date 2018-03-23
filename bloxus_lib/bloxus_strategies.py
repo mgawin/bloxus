@@ -64,8 +64,8 @@ def random_bvalue_strategy_with_rotates(board, bloxs, id):
 def _get_available_moves(board, bloxs, rotate=False):
     available_moves = []
     for ix, blox in enumerate(bloxs):
-        for x in range(13):
-            for y in range(13):
+        for x in range(14):
+            for y in range(14):
                 if board._is_allowed(blox, x, y):
                     available_moves.append({
                         "blox": blox,
