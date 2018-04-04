@@ -5,6 +5,7 @@ import copy
 def simple_strategy(board, bloxs, id):
     selected_moves = _get_available_moves(board, bloxs)
     if len(selected_moves) > 0:
+        del selected_moves[0]['blox']
         return selected_moves[0]
     else:
         return None

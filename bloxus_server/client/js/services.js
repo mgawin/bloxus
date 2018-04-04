@@ -18,6 +18,21 @@ app.factory('backendService', function ($http, $interval, $timeout) {
       });
       return promise;
     },
+    getMoves: function (gid, pid, bid, rotates) {
+      data = new URLSearchParams();
+      data.set('gid', gid);
+      data.set('pid', pid);
+      data.set('bid', bid);
+      data.set('rotates', rotates);
+
+
+      var promise = $http.post('http://127.0.0.1:8000/api/get_moves/', data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
+        return response.data;
+
+      })
+
+      return promise;
+    },
     checkMove: function (gid, pid, bid, rotates, x, y) {
       data = new URLSearchParams();
       data.set('gid', gid);
@@ -34,9 +49,18 @@ app.factory('backendService', function ($http, $interval, $timeout) {
 
       return promise;
     },
-    doMove: function (gid, pid, bid, rotates, x, y) {
-      var promise = $http.post('https://golang-mgawin.c9.io/_ah/api/blockus/v1/move?gid=' + gid + '&pid=' + pid + '&bid=' + bid + '&rotates=' + rotates + '&x=' + x + '&y=' + y).then(function (response) {
+    doMove: function (gid, pid, bid, rotates, x, y, callback) {
+      data = new URLSearchParams();
+      data.set('gid', gid);
+      data.set('pid', pid);
+      mov = "{'id':" + bid + ",'x':" + x + ",'y':" + y + ",'rotates':" + rotates + ",'flip':'false'}";
+
+      data.set('mov', mov);
+
+
+      var promise = $http.post('http://127.0.0.1:8000/api/move/', data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
         return response.data;
+
 
       })
 
