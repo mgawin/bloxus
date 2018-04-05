@@ -48,7 +48,7 @@ def init(request):
                 wg.save()
                 ser_game.persisted_game = dill.dumps(game).hex()
                 ser_game.save()
-    return JsonResponse({"gid": gid, "player": player.input_for_JSON()})
+    return JsonResponse({"gid": gid, "status": game.state, "player": player.input_for_JSON()})
 
 
 @csrf_exempt
@@ -85,7 +85,8 @@ def move(request):
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
     try:
         game.move(game.get_player(int(pid)), move)
-    except RuntimeError:
+    except RuntimeError as e:
+        print(str(e))
         return HttpResponseBadRequest()
     if ser_game.robot_game:
         try:

@@ -18,12 +18,13 @@ app.factory('backendService', function ($http, $interval, $timeout) {
       });
       return promise;
     },
-    getMoves: function (gid, pid, bid, rotates) {
+    getMoves: function (gid, pid, bid, rotates, flip) {
       data = new URLSearchParams();
       data.set('gid', gid);
       data.set('pid', pid);
       data.set('bid', bid);
       data.set('rotates', rotates);
+      data.set('flip', flip)
 
 
       var promise = $http.post('http://127.0.0.1:8000/api/get_moves/', data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
@@ -37,7 +38,7 @@ app.factory('backendService', function ($http, $interval, $timeout) {
       data = new URLSearchParams();
       data.set('gid', gid);
       data.set('pid', pid);
-      mov = "{'id':" + bid + ",'x':" + x + ",'y':" + y + ",'rotates':" + rotates + ",'flip':'false'}";
+      mov = "{'id':" + bid + ",'x':" + x + ",'y':" + y + ",'rotates':" + rotates + ",'flip':0}";
 
       data.set('mov', mov);
 
@@ -53,7 +54,7 @@ app.factory('backendService', function ($http, $interval, $timeout) {
       data = new URLSearchParams();
       data.set('gid', gid);
       data.set('pid', pid);
-      mov = "{'id':" + bid + ",'x':" + x + ",'y':" + y + ",'rotates':" + rotates + ",'flip':'false'}";
+      mov = "{'id':" + bid + ",'x':" + x + ",'y':" + y + ",'rotates':" + rotates + ",'flip':0}";
 
       data.set('mov', mov);
 

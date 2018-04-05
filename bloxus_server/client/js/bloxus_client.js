@@ -2,16 +2,48 @@ var app = angular.module('blockusApp', [])
   .controller('GameController', ['$scope', 'backendService', function ($scope, backendService) {
 
     backendService.init().then(function (data) {
-      $scope.gameId = data.gid;
-      $scope.state = '0'
-      $scope.blocked = true;
-      $scope.playerId = data.player.pid;
-      $scope.blocks = data.player.bloxs;
-
-      $scope.positionBlocks()
       backendService.intervalRepeat(function () {
         return backendService.getStatus($scope.gameId, $scope.playerId, $scope.manageStatus)
       });
+      $scope.gameId = data.gid;
+      $scope.state = '0';
+      $scope.playerId = data.player.pid;
+      $scope.blocks = data.player.bloxs;
+      switch (data.status) {
+        case 1:
+          $scope.blocked = true;
+          console.log("waiting");
+          break;
+        case 2:
+          //         console.log("Player A move");
+          console.log($scope.playerId)
+          if ($scope.playerId == 1) {
+
+            $scope.blocked = false;
+            //  $scope.drawMove(successResponse.data.last, '#B164DE');
+
+          }
+          else $scope.blocked = true;
+
+          break;
+        case '3':
+          //          console.log("Player B move");
+          if ($scope.playerId == 2) {
+
+            $scope.blocked = false;
+            //  $scope.drawMove(successResponse.data.last, 'orange');
+
+          }
+          else $scope.blocked = true;
+
+
+          break;
+
+      }
+
+
+      $scope.positionBlocks()
+
 
     });
 
@@ -69,7 +101,7 @@ var app = angular.module('blockusApp', [])
     $scope.manageStatus = function (promise) {
 
       promise.then(function (successResponse) {
-        console.log("Got game status code: " + successResponse.data.status);
+        //    console.log("Got game status code: " + successResponse.data.status);
         if ($scope.state != successResponse.data.status) {
           switch (successResponse.data.status) {
             case 1:
@@ -77,7 +109,7 @@ var app = angular.module('blockusApp', [])
               console.log("waiting");
               break;
             case 2:
-              console.log("Player A move");
+              //         console.log("Player A move");
               console.log($scope.playerId)
               if ($scope.playerId == 1) {
 
@@ -89,7 +121,7 @@ var app = angular.module('blockusApp', [])
 
               break;
             case '3':
-              console.log("Player B move");
+              //          console.log("Player B move");
               if ($scope.playerId == 2) {
 
                 $scope.blocked = false;
@@ -157,9 +189,9 @@ var app = angular.module('blockusApp', [])
 
 
     $scope.doMove = function (x, y) {
-
+      if ($scope.blocked) return;
       backendService.doMove($scope.gameId, $scope.playerId, $scope.selected.bid, $scope.selected.orientation_id, x, y).then(function (data) {
-
+        this.locked = true;
         $scope.drawMove(data.last, '#B164DE');
 
       })
@@ -178,7 +210,7 @@ var app = angular.module('blockusApp', [])
     $scope.getMoves = function () {
 
       $scope.allowed_moves = [];
-      backendService.getMoves($scope.gameId, $scope.playerId, $scope.selected.bid, $scope.selected.orientation_id).then(function (data) {
+      backendService.getMoves($scope.gameId, $scope.playerId, $scope.selected.bid, $scope.selected.orientation_id, 0).then(function (data) {
         $scope.allowed_moves = data.moves;
 
       })
@@ -242,6 +274,7 @@ var app = angular.module('blockusApp', [])
 
         var group = new paper.Group([]);
         group.bid = index;
+
         group.orientation_id = 0;
         group.locked = false;
 
@@ -279,7 +312,7 @@ var app = angular.module('blockusApp', [])
         group.onMouseDown = function () {
           console.log("down");
           if (this.locked || $scope.blocked) return;
-
+          console.log($scope.selected)
           if (($scope.selected == null) || ($scope.selected.bid != this.bid)) {
             $scope.selected = this;
             $scope.getMoves();
@@ -313,7 +346,7 @@ var app = angular.module('blockusApp', [])
             this.position = new paper.Point(offsetx + (Math.round((this.position.x - offsetx) / grid) * grid),
               offsety + (Math.round((this.position.y - offsety) / grid) * grid));
           };
-          console.log("I'm dragged");
+          //   console.log("I'm dragged");
         };
 
 
@@ -340,10 +373,12 @@ var app = angular.module('blockusApp', [])
           console.log("I'm dropped");
 
           if (move_allowed(x, y)) {
+
+
             $scope.doMove(x, y)
-            this.locked = true;
+            $scope.blocked = true;
             console.log('allowed')
-            $scope.blocked = false;
+
           }
           else {
 

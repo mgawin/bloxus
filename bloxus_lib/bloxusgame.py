@@ -68,9 +68,9 @@ class Game():
             blox = player.put(id)
             if blox is None:
                 raise RuntimeError("Non-existing blox id value.")
-            if rotates > 0:
-                blox.rotate(rotates)
-            if flip:
+            if int(rotates) > 0:
+                blox.rotate(int(rotates))
+            if int(flip) > 0:
                 blox.flip()
             self.game_end = 0
         else:
@@ -124,9 +124,9 @@ class Game():
         blox = player.get_blox(id)
         if blox is None:
             return False
-        if rotates > 0:
-            blox.rotate(rotates)
-        if flip:
+        if int(rotates) > 0:
+            blox.rotate(int(rotates))
+        if int(flip) > 0:
             blox.flip()
         return self.board._is_allowed(blox, x, y)
 
