@@ -31,13 +31,13 @@ def store_game(game):
 
 
 def store_move(id, move):
-    return
-    # move['gameId'] = id
-    # db_path = os.path.join(os.path.dirname(__file__),
-    #                        "./database/game_moves.json")
-    # db = TinyDB(db_path, create_dirs=True)
-    # db.insert(move)
-    # db.close()
+    # return
+    move['gameId'] = id
+    db_path = os.path.join(os.path.dirname(__file__),
+                           "./database/game_moves.json")
+    db = TinyDB(db_path, create_dirs=True)
+    db.insert(move)
+    db.close()
 
 
 def get_strategy_win_stats(strat):

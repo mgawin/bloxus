@@ -341,20 +341,20 @@ class Board():
         for index, val in np.ndenumerate(blox.body):
             if val > 0:
                 if vboard[x + index[0] - 1][y + index[1] - 1] == val and \
-                        vboard[x + index[0] - 1][y + index[1]] == 0 and \
-                        vboard[x + index[0]][y + index[1] - 1] == 0:
+                        vboard[x + index[0] - 1][y + index[1]] != val and \
+                        vboard[x + index[0]][y + index[1] - 1] != val:
                     return True
                 if vboard[x + index[0] + 1][y + index[1] - 1] == val and \
-                        vboard[x + index[0]][y + index[1] - 1] == 0 and \
+                        vboard[x + index[0]][y + index[1] - 1] != val and \
                         vboard[x + index[0] + 1][y + index[1]] == 0:
                     return True
                 if vboard[x + index[0] - 1][y + index[1] + 1] == val and \
-                        vboard[x + index[0] - 1][y + index[1]] == 0 and \
-                        vboard[x + index[0]][y + index[1] + 1] == 0:
+                        vboard[x + index[0] - 1][y + index[1]] != val and \
+                        vboard[x + index[0]][y + index[1] + 1] != val:
                     return True
                 if vboard[x + index[0] + 1][y + index[1] + 1] == val and \
-                        vboard[x + index[0]][y + index[1] + 1] == 0 and \
-                        vboard[x + index[0] + 1][y + index[1]] == 0:
+                        vboard[x + index[0]][y + index[1] + 1] != val and \
+                        vboard[x + index[0] + 1][y + index[1]] != val:
                     return True
         return False
 
