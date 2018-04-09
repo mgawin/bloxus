@@ -313,11 +313,19 @@ var app = angular.module('blockusApp', [])
           console.log("down");
           if (this.locked || $scope.blocked) return;
           console.log($scope.selected)
+          if (($scope.selected != null) && ($scope.selected.bid != this.bid)) {
+            $scope.selected.opacity = 0.8;
+
+          }
           if (($scope.selected == null) || ($scope.selected.bid != this.bid)) {
             $scope.selected = this;
             $scope.getMoves();
             console.log("I'm selected");
           }
+          if (event.detail == 1) {
+            this.opacity = 1;
+            this.bringToFront();
+          };
 
           if (event.detail == 2) {
             this.orientation_id += 1;
@@ -328,10 +336,7 @@ var app = angular.module('blockusApp', [])
             this.rotate(90, this.center);
             console.log("I'm rotated");
           }
-          if (event.detail == 1) {
-            this.opacity = 1;
-            this.bringToFront();
-          };
+
         };
 
 
