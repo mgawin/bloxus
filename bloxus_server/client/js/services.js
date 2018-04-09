@@ -12,7 +12,6 @@ app.factory('backendService', function ($http, $interval, $timeout) {
       data = new URLSearchParams();
       data.set('name', 'Maciej');
       data.set('auto', '');
-      console.log(data)
       var promise = $http.post('http://127.0.0.1:8000/api/init/', data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
         return response.data;
       });

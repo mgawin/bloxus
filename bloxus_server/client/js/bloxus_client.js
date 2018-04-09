@@ -191,7 +191,7 @@ var app = angular.module('blockusApp', [])
     $scope.doMove = function (x, y) {
       if ($scope.blocked) return;
       backendService.doMove($scope.gameId, $scope.playerId, $scope.selected.bid, $scope.selected.orientation_id, x, y).then(function (data) {
-        this.locked = true;
+
         $scope.drawMove(data.last, '#B164DE');
 
       })
@@ -352,7 +352,7 @@ var app = angular.module('blockusApp', [])
 
         group.onMouseUp = function () {
           console.log("up");
-
+          if (this.locked) return;
           if ($scope.blocked) {
 
             console.log('blocked');
@@ -368,16 +368,16 @@ var app = angular.module('blockusApp', [])
             return;
           }
           this.opacity = 0.75;
-          console.log($scope.selected)
+
           if (this.bid != $scope.selected.bid) return;
           console.log("I'm dropped");
 
           if (move_allowed(x, y)) {
-
-
+            this.locked = true;
+            console.log('allowed')
             $scope.doMove(x, y)
             $scope.blocked = true;
-            console.log('allowed')
+
 
           }
           else {
