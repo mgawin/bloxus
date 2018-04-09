@@ -296,7 +296,7 @@ class Board():
 
     def _is_allowed(self, blox, x, y):
         lx, ly = np.shape(blox.body)
-        if (x + lx > 13) or (y + ly > 13):
+        if (x + lx > 14) or (y + ly > 14):
             return False
         if self._overlaps_element(blox, x, y):
             return False

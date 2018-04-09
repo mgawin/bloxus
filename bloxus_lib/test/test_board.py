@@ -4,7 +4,7 @@ import bloxusgame as bg
 
 
 class TestStringMethods(unittest.TestCase):
-    def test_board_move_allowed1(self):
+    def test_board_move_adjacent_corner(self):
         b = bg.Board()
         b.moves_count = 3
         player = bg.Player('Name', 1)
@@ -26,3 +26,15 @@ class TestStringMethods(unittest.TestCase):
         print(b.show())
         blox = player.get_blox(3)
         self.assertTrue(b._is_allowed(blox, 0, 0))
+
+    def test_board_move_block_on_border(self):
+        b = bg.Board()
+        b.moves_count = 3
+        player = bg.Player('Name', 1)
+        b.board[10][8] = 1
+        b.board[10][9] = 1
+        b.board[10][10] = 1
+        print(b.show())
+        blox = player.get_blox(16)
+        print(blox.show())
+        self.assertTrue(b._is_allowed(blox, 11, 7))
