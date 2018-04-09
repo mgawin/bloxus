@@ -334,9 +334,9 @@ class Board():
         if self.moves_count < 2:
             return True
         vboard = np.zeros((16, 16))
-        vboard[2:16, 2:16] = self.board
-        x = x + 2
-        y = y + 2
+        vboard[1:15, 1:15] = self.board
+        x = x + 1
+        y = y + 1
         self._place(vboard, blox, x, y)
         for index, val in np.ndenumerate(blox.body):
             if val > 0:
@@ -362,9 +362,9 @@ class Board():
         if self.moves_count < 2:
             return False
         vboard = np.zeros((16, 16))
-        vboard[2:16, 2:16] = self.board
-        x = x + 2
-        y = y + 2
+        vboard[1:15, 1:15] = self.board
+        x = x + 1
+        y = y + 1
         for index, val in np.ndenumerate(blox.body):
             if val > 0:
                 if vboard[x + index[0] - 1][y + index[1]] == val or \
