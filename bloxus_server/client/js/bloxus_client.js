@@ -225,7 +225,6 @@ var app = angular.module('blockusApp', [])
     move_allowed = function (i, j) {
 
       var res = 0;
-      console.log($scope.allowed_moves)
       $scope.allowed_moves.forEach(function (e) {
 
         n = parseInt(e[0]);
@@ -333,7 +332,7 @@ var app = angular.module('blockusApp', [])
 
             $scope.getMoves();
 
-            this.rotate(90, this.center);
+            this.rotate(-90, this.center);
             console.log("I'm rotated");
           }
 
@@ -376,10 +375,11 @@ var app = angular.module('blockusApp', [])
 
           if (this.bid != $scope.selected.bid) return;
           console.log("I'm dropped");
-
+          console.log(x, y);
           if (move_allowed(x, y)) {
             this.locked = true;
             console.log('allowed')
+
             $scope.doMove(x, y)
             $scope.blocked = true;
 
