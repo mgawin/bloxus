@@ -58,7 +58,7 @@ def get(request):
     gid = request.GET.get('gid')
     ser_game = get_object_or_404(Game, pk=gid)
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
-    return JsonResponse({"status": game.state, "board": game.board.input_for_JSON()})
+    return JsonResponse({"status": game.state})
 
 
 @csrf_exempt
