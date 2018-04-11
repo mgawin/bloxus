@@ -190,7 +190,7 @@ var app = angular.module('blockusApp', [])
 
     $scope.doMove = function (x, y) {
       if ($scope.blocked) return;
-      backendService.doMove($scope.gameId, $scope.playerId, $scope.selected.bid, $scope.selected.orientation_id, x, y).then(function (data) {
+      backendService.doMove($scope.gameId, $scope.playerId, $scope.selected.bid, $scope.selected.orientation_id, $scope.selected.flipped, x, y).then(function (data) {
 
         $scope.drawMove(data.last, '#B164DE');
 
@@ -210,7 +210,7 @@ var app = angular.module('blockusApp', [])
     $scope.getMoves = function () {
 
       $scope.allowed_moves = [];
-      backendService.getMoves($scope.gameId, $scope.playerId, $scope.selected.bid, $scope.selected.orientation_id, 0).then(function (data) {
+      backendService.getMoves($scope.gameId, $scope.playerId, $scope.selected.bid, $scope.selected.orientation_id, $scope.selected.flipped).then(function (data) {
         $scope.allowed_moves = data.moves;
 
       })
@@ -275,6 +275,7 @@ var app = angular.module('blockusApp', [])
         group.bid = index;
 
         group.orientation_id = 0;
+        group.flipped = 0;
         group.locked = false;
 
 
@@ -311,6 +312,22 @@ var app = angular.module('blockusApp', [])
         group.onMouseDown = function () {
           console.log("down");
           if (this.locked || $scope.blocked) return;
+          if (event.button == 2) {
+            console.log("I'm flipped");
+            if (($scope.selected != null) && ($scope.selected.bid != this.bid)) {
+              $scope.selected.opacity = 0.8;
+
+            }
+            $scope.selected = this;
+            if (this.flipped == 0) this.flipped = 1; else this.flipped = 0;
+            $scope.getMoves();
+            console.log("I'm selected");
+            this.scale(-1, 1);
+            this.opacity = 1;
+            this.bringToFront();
+
+            return;
+          }
           console.log($scope.selected)
           if (($scope.selected != null) && ($scope.selected.bid != this.bid)) {
             $scope.selected.opacity = 0.8;
@@ -320,23 +337,36 @@ var app = angular.module('blockusApp', [])
             $scope.selected = this;
             $scope.getMoves();
             console.log("I'm selected");
-          }
-          if (event.detail == 1) {
             this.opacity = 1;
             this.bringToFront();
+          }
+          if (event.detail == 1) {
+
           };
 
-          if (event.detail == 2) {
-            this.orientation_id += 1;
-            if (this.orientation_id >= 4) this.orientation_id = this.orientation_id - 4;
+          // if (event.detail == 2) {
+          //   this.orientation_id += 1;
+          //   if (this.orientation_id >= 4) this.orientation_id = this.orientation_id - 4;
 
-            $scope.getMoves();
+          //   $scope.getMoves();
 
-            this.rotate(-90, this.center);
-            console.log("I'm rotated");
-          }
+          //   this.rotate(-90, this.center);
+          //   console.log("I'm rotated");
+          // }
 
         };
+
+        group.onDoubleClick = function () {
+
+          this.orientation_id += 1;
+          if (this.orientation_id >= 4) this.orientation_id = this.orientation_id - 4;
+
+          $scope.getMoves();
+
+          this.rotate(-90, this.center);
+          console.log("I'm rotated");
+
+        }
 
 
         group.onMouseDrag = function (event) {

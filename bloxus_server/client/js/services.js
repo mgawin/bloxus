@@ -49,11 +49,11 @@ app.factory('backendService', function ($http, $interval, $timeout) {
 
       return promise;
     },
-    doMove: function (gid, pid, bid, rotates, x, y, callback) {
+    doMove: function (gid, pid, bid, rotates, flip, x, y, callback) {
       data = new URLSearchParams();
       data.set('gid', gid);
       data.set('pid', pid);
-      mov = "{'id':" + bid + ",'x':" + x + ",'y':" + y + ",'rotates':" + rotates + ",'flip':0}";
+      mov = "{'id':" + bid + ",'x':" + x + ",'y':" + y + ",'rotates':" + rotates + ",'flip':" + flip + "}";
 
       data.set('mov', mov);
 

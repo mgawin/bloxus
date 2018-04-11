@@ -102,17 +102,18 @@ def move(request):
 
 @csrf_exempt
 def get_available_moves(request):
-    if not _verify_request_params(request, ["gid", "pid", "bid", "rotates"], "POST"):
+    if not _verify_request_params(request, ["gid", "pid", "bid", "rotates", "flip"], "POST"):
         return HttpResponseBadRequest()
     gid = request.POST.get('gid')
     ser_game = get_object_or_404(Game, pk=gid)
     pid = request.POST.get('pid')
     bid = request.POST.get('bid')
+    flip = request.POST.get('flip')
     rotates = request.POST.get('rotates')
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
 
     moves = game.board.get_available_moves(game.get_player(
-        int(pid)).get_blox(int(bid)), rotates=int(rotates))
+        int(pid)).get_blox(int(bid)), int(rotates), int(flip))
     return JsonResponse({"moves": moves})
 
 

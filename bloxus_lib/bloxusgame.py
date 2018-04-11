@@ -283,11 +283,13 @@ class Board():
                 self.board[x + index[0]][y + index[1]] = 0
         self.moves_count -= 1
 
-    def get_available_moves(self, blox, rotates):
+    def get_available_moves(self, blox, rotates, flip):
         available_moves = []
         temp_blox = copy.deepcopy(blox)
         for k in range(rotates):
             temp_blox.rotate()
+        if flip > 0:
+            temp_blox.flip()
         for x in range(14):
             for y in range(14):
                 if self._is_allowed(temp_blox, x, y):
