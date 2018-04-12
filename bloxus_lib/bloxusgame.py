@@ -348,7 +348,7 @@ class Board():
                     return True
                 if vboard[x + index[0] + 1][y + index[1] - 1] == val and \
                         vboard[x + index[0]][y + index[1] - 1] != val and \
-                        vboard[x + index[0] + 1][y + index[1]] == 0:
+                        vboard[x + index[0] + 1][y + index[1]] != val:
                     return True
                 if vboard[x + index[0] - 1][y + index[1] + 1] == val and \
                         vboard[x + index[0] - 1][y + index[1]] != val and \

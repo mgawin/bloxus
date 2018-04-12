@@ -67,7 +67,7 @@ class TestStringMethods(unittest.TestCase):
         print(blox.show())
         self.assertTrue(b._is_allowed(blox, 10, 9))
 
-    def test_board_move_allowed4(self):
+    def test_board_move_allowed_with_rotations2(self):
         b = bg.Board()
         b.moves_count = 3
         player = bg.Player('Name', 1)
@@ -94,3 +94,31 @@ class TestStringMethods(unittest.TestCase):
         blox.rotate(1)
         print(blox.show())
         self.assertTrue(b._is_allowed(blox, 8, 10))
+
+    def test_board_move_allowed_rotation3(self):
+        b = bg.Board()
+        b.moves_count = 3
+        player = bg.Player('Name', 1)
+        b.board[6][8] = 1
+        b.board[7][8] = 1
+        b.board[8][8] = 1
+        b.board[9][8] = 1
+        b.board[9][7] = 1
+
+        b.board[6][9] = 2
+        b.board[7][9] = 2
+        b.board[8][9] = 2
+        b.board[9][9] = 2
+        b.board[10][9] = 2
+
+        b.board[8][11] = 2
+        b.board[9][11] = 2
+        b.board[10][11] = 2
+        b.board[11][11] = 2
+        b.board[11][10] = 2
+
+        print(b.show())
+        blox = player.get_blox(16)
+        blox.rotate(2)
+        print(blox.show())
+        self.assertTrue(b._is_allowed(blox, 5, 9))
