@@ -1,5 +1,6 @@
 var app = angular.module('blockusApp', [])
   .controller('GameController', ['$scope', 'backendService', function ($scope, backendService) {
+    $scope.host_url = location.host;
 
     backendService.init().then(function (data) {
       backendService.intervalRepeat(function () {
@@ -279,6 +280,7 @@ var app = angular.module('blockusApp', [])
         group.locked = false;
 
 
+
         for (var j = 0; j < element.shp.length; j++) {
 
           for (var i = 0; i < element.shp[0].length; i++) {
@@ -301,6 +303,11 @@ var app = angular.module('blockusApp', [])
               group.opacity = 0.75;
               group.angle = 0;
               group.addChild(rect);
+              // group.shadowColor = new paper.Color(0, 0, 0);
+              // // Set the shadow blur radius to 12:
+              // group.shadowBlur = 30;
+              // // Offset the shadow by { x: 5, y: 5 }
+              // group.shadowOffset = new paper.Point(5, 5);
 
             }
           }

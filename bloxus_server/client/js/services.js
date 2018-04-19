@@ -1,23 +1,25 @@
 app.factory('backendService', function ($http, $interval, $timeout) {
   var backendService = {
     getGame: function (gid) {
-
-      var promise = $http.get('https://127.0.0.1/api/get/?gid=' + gid).then(function (response) {
+      host_url = location.host;
+      var promise = $http.get(host_url + '/api/get/?gid=' + gid).then(function (response) {
         return response.data;
       });
       return promise;
     },
     init: function () {
-
+      host_url = 'http://' + location.host;
       data = new URLSearchParams();
       data.set('name', 'Maciej');
       data.set('auto', '');
-      var promise = $http.post('http://127.0.0.1:8000/api/init/', data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
+      url = host_url + '/api/init/';
+      var promise = $http.post(url, data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
         return response.data;
       });
       return promise;
     },
     getMoves: function (gid, pid, bid, rotates, flip) {
+      host_url = 'http://' + location.host;
       data = new URLSearchParams();
       data.set('gid', gid);
       data.set('pid', pid);
@@ -26,7 +28,7 @@ app.factory('backendService', function ($http, $interval, $timeout) {
       data.set('flip', flip)
 
 
-      var promise = $http.post('http://127.0.0.1:8000/api/get_moves/', data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
+      var promise = $http.post(host_url + '/api/get_moves/', data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
         return response.data;
 
       })
@@ -34,6 +36,7 @@ app.factory('backendService', function ($http, $interval, $timeout) {
       return promise;
     },
     checkMove: function (gid, pid, bid, rotates, x, y) {
+      host_url = 'http://' + location.host;
       data = new URLSearchParams();
       data.set('gid', gid);
       data.set('pid', pid);
@@ -42,7 +45,7 @@ app.factory('backendService', function ($http, $interval, $timeout) {
       data.set('mov', mov);
 
 
-      var promise = $http.post('http://127.0.0.1:8000/api/check_move/', data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
+      var promise = $http.post(host_url + '/api/check_move/', data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
         return response.data;
 
       })
@@ -50,6 +53,7 @@ app.factory('backendService', function ($http, $interval, $timeout) {
       return promise;
     },
     doMove: function (gid, pid, bid, rotates, flip, x, y, callback) {
+      host_url = 'http://' + location.host;
       data = new URLSearchParams();
       data.set('gid', gid);
       data.set('pid', pid);
@@ -58,7 +62,7 @@ app.factory('backendService', function ($http, $interval, $timeout) {
       data.set('mov', mov);
 
 
-      var promise = $http.post('http://127.0.0.1:8000/api/move/', data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
+      var promise = $http.post(host_url + '/api/move/', data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
         return response.data;
 
 
@@ -67,7 +71,8 @@ app.factory('backendService', function ($http, $interval, $timeout) {
       return promise;
     },
     getStatus: function (gid, pid, callback) {
-      var promise = $http.get('http://127.0.0.1:8000/api/get/?gid=' + gid).then(function (response) {
+      host_url = 'http://' + location.host;
+      var promise = $http.get(host_url + '/api/get/?gid=' + gid).then(function (response) {
         return response;
 
       })
