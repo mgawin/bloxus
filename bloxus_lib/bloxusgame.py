@@ -42,10 +42,13 @@ class Game():
     def get_last_move(self):
         last_move = {}
         if self.move_history[0] is not None:
-            last_move["blox"] = self.move_history[0]["blox"].input_for_JSON()
-            last_move["pid"] = self.move_history[0]["player_id"]
-            last_move["x"] = self.move_history[0]["x"]
-            last_move["y"] = self.move_history[0]["y"]
+            if self.move_history[0]["blox"] != "":
+                last_move["blox"] = self.move_history[0]["blox"].input_for_JSON()
+                last_move["pid"] = self.move_history[0]["player_id"]
+                last_move["x"] = self.move_history[0]["x"]
+                last_move["y"] = self.move_history[0]["y"]
+            else:
+                last_move = None
         return last_move
 
     def get_player(self, id):
@@ -75,6 +78,15 @@ class Game():
             self.game_end = 0
         else:
             self.game_end += 1
+
+            move = {"player": player.id}
+            db.store_move(self.id, move)
+            self._add_to_history(
+                {"player_id": player.id, "blox": ""})
+            if self.state == GameState.PLAYER_A:
+                self.state = GameState.PLAYER_B
+            elif self.state == GameState.PLAYER_B:
+                self.state = GameState.PLAYER_A
             if self.game_end > 3:
                 self.state = GameState.FINISHED
                 self.playerA.calculate_score()
