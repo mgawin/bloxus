@@ -71,8 +71,8 @@ var app = angular.module('blockusApp', ['ngMaterial'])
     paper.setup(canvas);
 
     var grid = 24;
-    var shiftx = 96;
-    var shifty = 48;
+    var shiftx = 120;
+    var shifty = 96;
 
     for (var i = 0; i < 15; i++) {
 
@@ -316,7 +316,7 @@ var app = angular.module('blockusApp', ['ngMaterial'])
 
 
     $scope.positionBlocks = function () {
-      var y = grid;
+      var y = 3 * grid;
       var x = 450;
       var color;
       if ($scope.playerId == 1) color = 'orange';
