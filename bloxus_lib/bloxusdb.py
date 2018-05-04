@@ -7,8 +7,12 @@ def store_game(game):
                            "./database/game_stats.json")
     db = TinyDB(db_path, create_dirs=True)
     record = {"game": game.id}
-    record["playerA"] = {"strategy": game.playerA.strategy.__name__}
-    record["playerB"] = {"strategy": game.playerB.strategy.__name__}
+    if game.playerA.strategy is not None:
+        strat = game.playerA.strategy.__name__
+    record["playerA"] = {"strategy": strat}
+    if game.playerB.strategy is not None:
+        strat = game.playerA.strategy.__name__
+    record["playerB"] = {"strategy": strat}
 
     record["playerA"]["name"] = game.playerA.name
     record["playerB"]["name"] = game.playerB.name

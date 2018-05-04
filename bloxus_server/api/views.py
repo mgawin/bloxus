@@ -6,6 +6,7 @@ import dill
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+import time
 import ast
 
 
@@ -82,9 +83,15 @@ def move(request):
     ser_game = get_object_or_404(Game, pk=gid)
     pid = request.POST.get('pid')
     move = ast.literal_eval(request.POST.get('mov'))
+    if move['id'] is None:
+        move = None
+
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
     try:
         game.move(game.get_player(int(pid)), move)
+        print(game.state)
+        ser_game.persisted_game = dill.dumps(game).hex()
+        ser_game.save()
     except RuntimeError as e:
         print(str(e))
         return HttpResponseBadRequest()
@@ -95,8 +102,10 @@ def move(request):
         except RuntimeError:
             return HttpResponseBadRequest()
     ser_game.persisted_game = dill.dumps(game).hex()
+    time.sleep(0)
     ser_game.save()
     print(last_move)
+
     return JsonResponse({"status": game.state, "board": game.board.input_for_JSON(), "last": last_move})
 
 

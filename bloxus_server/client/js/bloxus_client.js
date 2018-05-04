@@ -1,5 +1,5 @@
-var app = angular.module('blockusApp', [])
-  .controller('GameController', ['$scope', 'backendService', function ($scope, backendService) {
+var app = angular.module('blockusApp', ['ngMaterial'])
+  .controller('GameController', ['$scope', '$mdToast', 'backendService', function ($scope, $mdToast, backendService) {
     $scope.host_url = location.host;
 
 
@@ -13,43 +13,45 @@ var app = angular.module('blockusApp', [])
       $scope.state = '0';
       $scope.playerId = data.player.pid;
       $scope.blocks = data.player.bloxs;
-      switch (data.status) {
-        case 1:
-          $scope.blocked = true;
-          $scope.message = "Wait for the opponent...";
-          console.log("waiting");
-          break;
-        case 2:
-          //         console.log("Player A move");
-          console.log($scope.playerId)
-          if ($scope.playerId == 1) {
+      $scope.setStatus(data.status);
+      // switch (data.status) {
+      //   case 1:
+      //     $scope.blocked = true;
+      //     $scope.message = "Wait for the opponent...";
+      //     $scope.showMessage($scope.message);
+      //     console.log("waiting");
+      //     break;
+      //   case 2:
+      //     //         console.log("Player A move");
+      //     console.log($scope.playerId)
+      //     if ($scope.playerId == 1) {
 
-            $scope.blocked = false;
-            $scope.message = "Your turn!";
-            //  $scope.drawMove(successResponse.data.last, '#B164DE');
+      //       $scope.blocked = false;
+      //       $scope.message = "Your turn!";
+      //       //  $scope.drawMove(successResponse.data.last, '#B164DE');
 
-          }
-          else {
-            $scope.blocked = true;
-            $scope.message = "Opponent's turn - wait!";
-          }
-          break;
-        case '3':
-          //          console.log("Player B move");
-          if ($scope.playerId == 2) {
+      //     }
+      //     else {
+      //       $scope.blocked = true;
+      //       $scope.message = "Opponent's turn - wait!";
+      //     }
+      //     break;
+      //   case '3':
+      //     //          console.log("Player B move");
+      //     if ($scope.playerId == 2) {
 
-            $scope.blocked = false;
-            $scope.message = "Your turn!";
-            //  $scope.drawMove(successResponse.data.last, 'orange');
+      //       $scope.blocked = false;
+      //       $scope.message = "Your turn!";
+      //       //  $scope.drawMove(successResponse.data.last, 'orange');
 
-          }
-          else {
-            $scope.blocked = true;
-            $scope.message = "Opponent's turn - wait!";
-          }
-          break;
+      //     }
+      //     else {
+      //       $scope.blocked = true;
+      //       $scope.message = "Opponent's turn - wait!";
+      //     }
+      //     break;
 
-      }
+      // }
 
 
       $scope.positionBlocks()
@@ -107,6 +109,15 @@ var app = angular.module('blockusApp', [])
     rect.fillColor.alpha = 0.5;
 
 
+    $scope.showMessage = function (text) {
+      $mdToast.hide();
+      $mdToast.show(
+        $mdToast.simple()
+          .textContent(text)
+          .position('top left')
+          .hideDelay(0)
+      );
+    }
 
     $scope.manageStatus = function (promise) {
 
@@ -122,6 +133,8 @@ var app = angular.module('blockusApp', [])
         })
 
     }
+
+
 
     $scope.drawMove = function (move, color) {
       var group = new paper.Group([]);
@@ -164,7 +177,8 @@ var app = angular.module('blockusApp', [])
         switch (status) {
           case 1:
             $scope.blocked = true;
-            console.log("Waiting for your opponent...");
+            $scope.message = "Waiting for your opponent...";
+            $scope.showMessage($scope.message);
             break;
           case 2:
             //         console.log("Player A move");
@@ -173,12 +187,14 @@ var app = angular.module('blockusApp', [])
 
               $scope.blocked = false;
               $scope.message = "Your turn!"
+              $scope.showMessage($scope.message);
               //  $scope.drawMove(successResponse.data.last, '#B164DE');
 
             }
             else {
               $scope.blocked = true;
               $scope.message = "Opponent's turn - wait!";
+              $scope.showMessage($scope.message);
 
             }
             break;
@@ -188,12 +204,14 @@ var app = angular.module('blockusApp', [])
 
               $scope.blocked = false;
               $scope.message = "Your turn!";
+              $scope.showMessage($scope.message);
               //  $scope.drawMove(successResponse.data.last, 'orange');
 
             }
             else {
               $scope.blocked = true;
               $scope.message = "Opponent's turn - wait!";
+              $scope.showMessage($scope.message);
 
 
             }
@@ -213,11 +231,31 @@ var app = angular.module('blockusApp', [])
     $scope.doMove = function (x, y) {
       if ($scope.blocked) return;
       backendService.doMove($scope.gameId, $scope.playerId, $scope.selected.bid, $scope.selected.orientation_id, $scope.selected.flipped, x, y).then(function (data) {
-
         $scope.drawMove(data.last, '#B164DE');
-        $scope.setStatus(data.status)
+        $scope.setStatus(data.status);
+
       })
-      console.log("moved")
+      console.log("moved");
+
+    }
+
+    $scope.skipMove = function () {
+
+
+      if ($scope.blocked) return;
+      console.log('allowed');
+      $scope.message = "Opponent's turn - wait!";
+      $scope.state = 3;
+      $scope.showMessage($scope.message);
+
+      backendService.doMove($scope.gameId, $scope.playerId, 'None', 'None', 'None', 'None', 'None').then(function (data) {
+        $scope.drawMove(data.last, '#B164DE');
+        $scope.setStatus(data.status);
+
+      })
+      $scope.blocked = true;
+
+      console.log("skipped");
 
     }
 
@@ -439,6 +477,7 @@ var app = angular.module('blockusApp', [])
             console.log('allowed');
             $scope.message = "Opponent's turn - wait!";
             $scope.state = 3;
+            $scope.showMessage($scope.message);
             $scope.doMove(x, y);
             $scope.blocked = true;
 

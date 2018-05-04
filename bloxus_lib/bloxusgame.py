@@ -63,7 +63,7 @@ class Game():
     def move(self, player, move=None):
         if (self.state != GameState.PLAYER_A) and (self.state != GameState.PLAYER_B):
             raise RuntimeError("Invalid action. Game not in progress.")
-        if move is None:
+        if move is None and player.strategy is not None:
             move = player.getMove(self.board)
         if move:
             id, x, y, rotates, flip = move["id"], move["x"], move[
