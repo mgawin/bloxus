@@ -384,7 +384,7 @@ class Board():
                 if vboard[x + index[0] - 1][y + index[1]] == val or \
                         vboard[x + index[0]][y + index[1] - 1] == val or \
                         vboard[x + index[0]][y + index[1] + 1] == val or \
-                        vboard[x + index[0]][y + index[1] + 1] == val:
+                        vboard[x + index[0] + 1][y + index[1]] == val:
                     return True
         return False
 

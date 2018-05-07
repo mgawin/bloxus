@@ -122,3 +122,27 @@ class TestStringMethods(unittest.TestCase):
         blox.rotate(2)
         print(blox.show())
         self.assertTrue(b._is_allowed(blox, 5, 9))
+
+    def test_board_move_not_allowed_touching_side(self):
+        b = bg.Board()
+        b.moves_count = 3
+        player = bg.Player('Name', 1)
+        b.board[0][2] = 1
+        b.board[1][0] = 1
+        b.board[1][1] = 1
+        b.board[1][2] = 1
+        b.board[2][2] = 1
+
+        b.board[3][3] = 1
+        b.board[4][2] = 1
+        b.board[4][3] = 1
+        b.board[4][4] = 1
+
+        b.board[3][5] = 1
+        b.board[3][6] = 1
+        b.board[3][7] = 1
+
+        print(b.show())
+        blox = player.get_blox(13)
+        print(blox.show())
+        self.assertFalse(b._is_allowed(blox, 1, 4))
