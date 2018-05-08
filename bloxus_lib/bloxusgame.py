@@ -172,7 +172,7 @@ class Player():
                         line):
                     raise RuntimeError("Invalid block shapes file.")
                 if line[0] == "\n":
-                    self.bloxs.append(Blox(element, val, blox_id))
+                    self.bloxs.append(Blox(element, val, blox_id, self.id))
                     self.value += val
                     blox_id += 1
                     element = []
@@ -185,7 +185,7 @@ class Player():
                 ]
                 element.append(row)
             if len(element) > 0:
-                self.bloxs.append(Blox(element, val, blox_id))
+                self.bloxs.append(Blox(element, val, blox_id, self.id))
                 self.value += val
                 blox_id += 1
 
@@ -231,12 +231,13 @@ class Player():
 
 
 class Blox():
-    def __init__(self, shape, value, id):
+    def __init__(self, shape, value, blox_id, player_id):
         self.body = np.array(shape)
         self.value = value
-        self.id = id
+        self.id = blox_id
         self.flipped = False
         self.rotated = 0
+        self.pid = player_id
 
     def show(self):
         s = ""
@@ -264,6 +265,7 @@ class Board():
     def __init__(self):
         self.board = np.zeros((14, 14))
         self.moves_count = 0
+        self.colors_on_board = []
 
     def show(self):
         s = ""
@@ -282,6 +284,8 @@ class Board():
             raise RuntimeError("Illegal move")
         else:
             self._place(self.board, blox, x, y)
+            if blox.pid not in self.colors_on_board:
+                self.colors_on_board.append(blox.pid)
             self.moves_count += 1
 
     def _place(self, board, blox, x, y):
@@ -345,8 +349,9 @@ class Board():
         return False
 
     def _is_adjacent_own_corner(self, blox, x, y):
-        if self.moves_count < 2:
+        if (blox.pid not in self.colors_on_board) or (self.moves_count < 2):
             return True
+
         vboard = np.zeros((16, 16))
         vboard[1:15, 1:15] = self.board
         x = x + 1

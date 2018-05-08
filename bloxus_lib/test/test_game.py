@@ -1,9 +1,10 @@
 import unittest
 
 import bloxusgame as bg
+import bloxus_strategies as strat
 
 
-class TestStringMethods(unittest.TestCase):
+class TestGameMethods(unittest.TestCase):
     def test_invalid_move_touching_side(self):
         self.game = bg.Game(bg.Player("A", 1), bg.Player("B", 2))
         self.game.move(self.game.playerA, {
@@ -200,3 +201,12 @@ class TestStringMethods(unittest.TestCase):
                 self.game.playerA, {"id": 11, "x": 1, "y": 4, "rotates": 0,
                                     "flip": False})
         )
+
+    def test_skip_move_beginning_game(self):
+        self.game = bg.Game(bg.Player("A", 1), bg.Player(
+            "B", 2, strat.random_bvalue_strategy))
+        self.game.move(self.game.playerA, None)
+        self.game.move(self.game.playerB)
+        self.game.move(self.game.playerA, None)
+        self.game.move(self.game.playerB)
+        print(self.game.board.show())
