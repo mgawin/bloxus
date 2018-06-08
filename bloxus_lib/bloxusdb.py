@@ -3,8 +3,7 @@ import os.path
 
 
 def store_game(game):
-    db_path = os.path.join(os.path.dirname(__file__),
-                           "./database/game_stats.json")
+    db_path = os.path.join(os.path.dirname(__file__), "./database/game_stats.json")
     db = TinyDB(db_path, create_dirs=True)
     record = {"game": game.id}
     strat = None
@@ -15,10 +14,8 @@ def store_game(game):
     if game.playerB.strategy is not None:
         strat = game.playerB.strategy.__name__
     record["playerB"] = {"strategy": strat}
-
     record["playerA"]["name"] = game.playerA.name
     record["playerB"]["name"] = game.playerB.name
-
     record["playerA"]["score"] = game.playerA.score
     record["playerB"]["score"] = game.playerB.score
     if game.playerA.score > game.playerB.score:
@@ -38,27 +35,24 @@ def store_game(game):
 
 def store_move(id, move):
     # return
-    move['gameId'] = id
-    db_path = os.path.join(os.path.dirname(__file__),
-                           "./database/game_moves.json")
+    move["gameId"] = id
+    db_path = os.path.join(os.path.dirname(__file__), "./database/game_moves.json")
     db = TinyDB(db_path, create_dirs=True)
     db.insert(move)
     db.close()
 
 
 def get_strategy_win_stats(strat):
-    db_path = os.path.join(os.path.dirname(__file__),
-                           "./database/game_stats.json")
+    db_path = os.path.join(os.path.dirname(__file__), "./database/game_stats.json")
     db = TinyDB(db_path, create_dirs=False)
     games = db.search(where("playerB").strategy == strat)
 
     games += db.search(where("playerA").strategy == strat)
     win = 0
     for game in games:
-        if (game["playerA"]["win"] == "Y" and
-            game["playerA"]["strategy"] == strat) or \
-            (game["playerB"]["win"] == "Y" and
-             game["playerB"]["strategy"] == strat):
+        if (game["playerA"]["win"] == "Y" and game["playerA"]["strategy"] == strat) or (
+            game["playerB"]["win"] == "Y" and game["playerB"]["strategy"] == strat
+        ):
             win += 1
 
     if len(games) > 0:
@@ -72,8 +66,7 @@ def get_strategy_win_stats(strat):
 
 
 def get_moves(id):
-    db_path = os.path.join(os.path.dirname(__file__),
-                           "./database/game_moves.json")
+    db_path = os.path.join(os.path.dirname(__file__), "./database/game_moves.json")
     db = TinyDB(db_path, create_dirs=False)
     games = db.search(where("gameId") == id)
     return games

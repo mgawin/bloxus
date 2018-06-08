@@ -4,9 +4,7 @@ import bloxusdb as db
 
 
 def replay_game(id):
-    game = bg.Game(
-        bg.Player("A", 1),
-        bg.Player("B", 2))
+    game = bg.Game(bg.Player("A", 1), bg.Player("B", 2))
     moves = db.get_moves(id)
 
     i = 0
@@ -23,4 +21,4 @@ def replay_game(id):
         k = input("press key")
 
 
-replay_game('2d568e32e37748dc95c83de0c9fa107d')
+replay_game("2d568e32e37748dc95c83de0c9fa107d")
