@@ -104,9 +104,11 @@ def move(request):
     ser_game.persisted_game = dill.dumps(game).hex()
     time.sleep(0)
     ser_game.save()
-    print(last_move)
-
-    return JsonResponse({"status": game.state, "board": game.board.input_for_JSON(), "last": last_move})
+    result = {}
+    if game.state is bg.GameState.FINISHED:
+        result = game.get_game_result_for_JSON()
+    return JsonResponse({"status": game.state, "board": game.board.input_for_JSON(), "last": last_move,
+                         "result": result})
 
 
 @csrf_exempt

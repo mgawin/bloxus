@@ -210,3 +210,12 @@ class TestGameMethods(unittest.TestCase):
         self.game.move(self.game.playerA, None)
         self.game.move(self.game.playerB)
         print(self.game.board.show())
+
+    def test_get_game_result(self):
+        self.game = bg.Game(bg.Player("A", 1), bg.Player(
+            "B", 2, strat.random_bvalue_strategy))
+        self.game.playerA.score = 5
+        self.game.playerB.score = 7
+        self.game.state = bg.GameState.FINISHED
+        self.assertEqual(self.game.get_game_result_for_JSON(),
+                         {'winner': '2', 'score': {'1': '5', '2': '7'}})

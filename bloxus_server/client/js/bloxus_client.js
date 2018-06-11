@@ -216,6 +216,12 @@ var app = angular.module('blockusApp', ['ngMaterial'])
 
             }
             break;
+          case '4':
+            $scope.blocked = true;
+            $scope.message = "end of game";
+            $scope.showMessage($scope.message);
+            console.log("end of game");
+            break;
         }
 
         $scope.state = status;
@@ -231,7 +237,10 @@ var app = angular.module('blockusApp', ['ngMaterial'])
     $scope.doMove = function (x, y) {
       if ($scope.blocked) return;
       backendService.doMove($scope.gameId, $scope.playerId, $scope.selected.bid, $scope.selected.orientation_id, $scope.selected.flipped, x, y).then(function (data) {
-        $scope.drawMove(data.last, '#B164DE');
+        console.log(data.last);
+        if (!(Object.keys(data.last).length === 0 && data.last.constructor === Object)) {
+          $scope.drawMove(data.last, '#B164DE');
+        }
         $scope.setStatus(data.status);
 
       })
@@ -249,7 +258,9 @@ var app = angular.module('blockusApp', ['ngMaterial'])
       $scope.showMessage($scope.message);
 
       backendService.doMove($scope.gameId, $scope.playerId, 'None', 'None', 'None', 'None', 'None').then(function (data) {
-        $scope.drawMove(data.last, '#B164DE');
+        if (!(Object.keys(data.last).length === 0 && data.last.constructor === Object)) {
+          $scope.drawMove(data.last, '#B164DE');
+        }
         $scope.setStatus(data.status);
 
       })

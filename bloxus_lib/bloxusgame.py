@@ -6,16 +6,19 @@ from enum import IntEnum
 import copy
 
 
-class Game():
+class Game:
     def show(self):
         if self.next_A:
             next = "A"
         else:
             next = "B"
-        return "\n**********************\nMove {}\n".format(
-            self.board.moves_count) + "Next to move: {}\n".format(
-                next) + self.playerA.show() + self.playerB.show(
-        ) + self.board.show()
+        return (
+            "\n**********************\nMove {}\n".format(self.board.moves_count)
+            + "Next to move: {}\n".format(next)
+            + self.playerA.show()
+            + self.playerB.show()
+            + self.board.show()
+        )
 
     def __init__(self, playerA=None, playerB=None):
         self.board = Board()
@@ -47,9 +50,23 @@ class Game():
                 last_move["pid"] = self.move_history[0]["player_id"]
                 last_move["x"] = self.move_history[0]["x"]
                 last_move["y"] = self.move_history[0]["y"]
-            else:
-                last_move = None
         return last_move
+
+    def get_game_result_for_JSON(self):
+        if self.state is not GameState.FINISHED:
+            return
+        result = {}
+        if self.playerA.score > self.playerB.score:
+            result["winner"] = str(self.playerA.id)
+        elif self.playerA.score < self.playerB.score:
+            result["winner"] = str(self.playerB.id)
+        else:
+            result["winner"] = "0"
+        result["score"] = {
+            str(self.playerA.id): str(self.playerA.score),
+            str(self.playerB.id): str(self.playerB.score),
+        }
+        return result
 
     def get_player(self, id):
         if self.playerA.id == id:
@@ -66,8 +83,13 @@ class Game():
         if move is None and player.strategy is not None:
             move = player.getMove(self.board)
         if move:
-            id, x, y, rotates, flip = move["id"], move["x"], move[
-                "y"], move["rotates"], move["flip"]
+            id, x, y, rotates, flip = (
+                move["id"],
+                move["x"],
+                move["y"],
+                move["rotates"],
+                move["flip"],
+            )
             blox = player.put(id)
             if blox is None:
                 raise RuntimeError("Non-existing blox id value.")
@@ -81,8 +103,7 @@ class Game():
 
             move = {"player": player.id}
             db.store_move(self.id, move)
-            self._add_to_history(
-                {"player_id": player.id, "blox": ""})
+            self._add_to_history({"player_id": player.id, "blox": ""})
             if self.state == GameState.PLAYER_A:
                 self.state = GameState.PLAYER_B
             elif self.state == GameState.PLAYER_B:
@@ -104,10 +125,9 @@ class Game():
                 self.state = GameState.PLAYER_B
             elif self.state == GameState.PLAYER_B:
                 self.state = GameState.PLAYER_A
-            move['player'] = player.id
+            move["player"] = player.id
             db.store_move(self.id, move)
-            self._add_to_history(
-                {"player_id": player.id, "blox": blox, "x": x, "y": y})
+            self._add_to_history({"player_id": player.id, "blox": blox, "x": x, "y": y})
         else:
             raise PermissionError("Wrong turn order!")
 
@@ -132,7 +152,13 @@ class Game():
         return False
 
     def is_allowed(self, player, move):
-        id, x, y, rotates, flip = move["id"], move["x"], move["y"], move["rotates"], move["flip"]
+        id, x, y, rotates, flip = (
+            move["id"],
+            move["x"],
+            move["y"],
+            move["rotates"],
+            move["flip"],
+        )
         blox = player.get_blox(id)
         if blox is None:
             return False
@@ -148,15 +174,14 @@ class Game():
             del self.move_history[-1]
 
 
-class Player():
+class Player:
     def __init__(self, name, id, strategy=None):
         self.name = name
         self.id = id
         self.bloxs = []
         self.value = 0
         self.strategy = strategy
-        shape_path = os.path.join(
-            os.path.dirname(__file__), "./res/shapes.txt")
+        shape_path = os.path.join(os.path.dirname(__file__), "./res/shapes.txt")
         self._add_blox(shape_path)
 
     def getMove(self, board):
@@ -168,8 +193,7 @@ class Player():
             element = []
             val = 0
             for line in fp:
-                if line.count("0") + line.count("1") + line.count("\n") != len(
-                        line):
+                if line.count("0") + line.count("1") + line.count("\n") != len(line):
                     raise RuntimeError("Invalid block shapes file.")
                 if line[0] == "\n":
                     self.bloxs.append(Blox(element, val, blox_id, self.id))
@@ -179,10 +203,7 @@ class Player():
                     val = 0
                     continue
                 val += line.count("1")
-                row = [
-                    int(i)
-                    for i in list(line.strip().replace('1', str(self.id)))
-                ]
+                row = [int(i) for i in list(line.strip().replace("1", str(self.id)))]
                 element.append(row)
             if len(element) > 0:
                 self.bloxs.append(Blox(element, val, blox_id, self.id))
@@ -196,8 +217,7 @@ class Player():
         s = ""
         for b in self.bloxs:
             s += b.show()
-        return "Player {}\n".format(self.name) + "Hand value: {}\n".format(
-            self.value)
+        return "Player {}\n".format(self.name) + "Hand value: {}\n".format(self.value)
 
     def input_for_JSON(self):
         obj = {"name": self.name, "pid": self.id}
@@ -230,7 +250,7 @@ class Player():
                 self.score += 5
 
 
-class Blox():
+class Blox:
     def __init__(self, shape, value, blox_id, player_id):
         self.body = np.array(shape)
         self.value = value
@@ -249,7 +269,7 @@ class Blox():
         shape = []
         for row in self.body:
             shape.append([int(i) for i in row])
-        return {'shp': shape, 'bid': self.id}
+        return {"shp": shape, "bid": self.id}
 
     def rotate(self, rotates=1):
         for i in range(rotates):
@@ -261,7 +281,7 @@ class Blox():
         self.flip = not self.flip
 
 
-class Board():
+class Board:
     def __init__(self):
         self.board = np.zeros((14, 14))
         self.moves_count = 0
@@ -327,24 +347,26 @@ class Board():
         return True
 
     def _covers_field(self, blox, x, y, px, py):
-        if (px < x or py < y):
+        if px < x or py < y:
             return False
-        if (px - x + 1 <= len(blox.body)) and (py - y + 1 <= len(
-                blox.body[0])):
+        if (px - x + 1 <= len(blox.body)) and (py - y + 1 <= len(blox.body[0])):
             return blox.body[px - x][py - y] > 0
 
     def _overlaps_element(self, blox, x, y):
         for index, val in np.ndenumerate(blox.body):
-            if self._covers_field(
-                    blox, x, y, x + index[0], y +
-                    index[1]) and self.board[x + index[0]][y + index[1]] > 0:
+            if (
+                self._covers_field(blox, x, y, x + index[0], y + index[1])
+                and self.board[x + index[0]][y + index[1]] > 0
+            ):
                 return True
         return False
 
     def _is_illegal_initial_move(self, blox, x, y):
         if self.moves_count < 2:
-            if not (self._covers_field(blox, x, y, 4, 4) or
-                    self._covers_field(blox, x, y, 9, 9)):
+            if not (
+                self._covers_field(blox, x, y, 4, 4)
+                or self._covers_field(blox, x, y, 9, 9)
+            ):
                 return True
         return False
 
@@ -359,21 +381,29 @@ class Board():
         self._place(vboard, blox, x, y)
         for index, val in np.ndenumerate(blox.body):
             if val > 0:
-                if vboard[x + index[0] - 1][y + index[1] - 1] == val and \
-                        vboard[x + index[0] - 1][y + index[1]] != val and \
-                        vboard[x + index[0]][y + index[1] - 1] != val:
+                if (
+                    vboard[x + index[0] - 1][y + index[1] - 1] == val
+                    and vboard[x + index[0] - 1][y + index[1]] != val
+                    and vboard[x + index[0]][y + index[1] - 1] != val
+                ):
                     return True
-                if vboard[x + index[0] + 1][y + index[1] - 1] == val and \
-                        vboard[x + index[0]][y + index[1] - 1] != val and \
-                        vboard[x + index[0] + 1][y + index[1]] != val:
+                if (
+                    vboard[x + index[0] + 1][y + index[1] - 1] == val
+                    and vboard[x + index[0]][y + index[1] - 1] != val
+                    and vboard[x + index[0] + 1][y + index[1]] != val
+                ):
                     return True
-                if vboard[x + index[0] - 1][y + index[1] + 1] == val and \
-                        vboard[x + index[0] - 1][y + index[1]] != val and \
-                        vboard[x + index[0]][y + index[1] + 1] != val:
+                if (
+                    vboard[x + index[0] - 1][y + index[1] + 1] == val
+                    and vboard[x + index[0] - 1][y + index[1]] != val
+                    and vboard[x + index[0]][y + index[1] + 1] != val
+                ):
                     return True
-                if vboard[x + index[0] + 1][y + index[1] + 1] == val and \
-                        vboard[x + index[0]][y + index[1] + 1] != val and \
-                        vboard[x + index[0] + 1][y + index[1]] != val:
+                if (
+                    vboard[x + index[0] + 1][y + index[1] + 1] == val
+                    and vboard[x + index[0]][y + index[1] + 1] != val
+                    and vboard[x + index[0] + 1][y + index[1]] != val
+                ):
                     return True
         return False
 
@@ -386,10 +416,12 @@ class Board():
         y = y + 1
         for index, val in np.ndenumerate(blox.body):
             if val > 0:
-                if vboard[x + index[0] - 1][y + index[1]] == val or \
-                        vboard[x + index[0]][y + index[1] - 1] == val or \
-                        vboard[x + index[0]][y + index[1] + 1] == val or \
-                        vboard[x + index[0] + 1][y + index[1]] == val:
+                if (
+                    vboard[x + index[0] - 1][y + index[1]] == val
+                    or vboard[x + index[0]][y + index[1] - 1] == val
+                    or vboard[x + index[0]][y + index[1] + 1] == val
+                    or vboard[x + index[0] + 1][y + index[1]] == val
+                ):
                     return True
         return False
 
