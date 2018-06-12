@@ -173,7 +173,9 @@ var app = angular.module('blockusApp', ['ngMaterial'])
 
 
     $scope.setStatus = function (status) {
+
       if ($scope.state != status) {
+        console.log("changing status");
         switch (status) {
           case 1:
             $scope.blocked = true;
@@ -198,7 +200,7 @@ var app = angular.module('blockusApp', ['ngMaterial'])
 
             }
             break;
-          case '3':
+          case 3:
             //          console.log("Player B move");
             if ($scope.playerId == 2) {
 
@@ -216,7 +218,8 @@ var app = angular.module('blockusApp', ['ngMaterial'])
 
             }
             break;
-          case '4':
+          case 4:
+            console.log("setting end");
             $scope.blocked = true;
             $scope.message = "end of game";
             $scope.showMessage($scope.message);
