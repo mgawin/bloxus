@@ -1,5 +1,7 @@
-app.factory('backendService', function ($http, $interval, $timeout) {
-  var backendService = {
+var app = angular.module('blockusApp', ['ngMaterial']);
+
+app.factory('backendService', ['$http', '$interval', '$timeout', function ($http, $interval, $timeout) {
+  return {
     getGame: function (gid) {
       host_url = location.host;
       var promise = $http.get(host_url + '/api/get/?gid=' + gid).then(function (response) {
@@ -90,5 +92,4 @@ app.factory('backendService', function ($http, $interval, $timeout) {
 
 
   };
-  return backendService;
-});
+}]);

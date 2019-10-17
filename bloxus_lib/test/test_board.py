@@ -1,13 +1,13 @@
 import unittest
 
-import bloxusgame as bg
+import bloxus_lib.bloxusgame as bg
 
 
 class TestStringMethods(unittest.TestCase):
     def test_board_move_adjacent_corner(self):
         b = bg.Board()
         b.moves_count = 3
-        player = bg.Player('Name', 1)
+        player = bg.Player("Name", 1)
         b.board[2][0] = 2
         b.board[2][1] = 2
         b.board[3][0] = 2
@@ -30,7 +30,7 @@ class TestStringMethods(unittest.TestCase):
     def test_board_move_block_on_border(self):
         b = bg.Board()
         b.moves_count = 3
-        player = bg.Player('Name', 1)
+        player = bg.Player("Name", 1)
         b.board[10][8] = 1
         b.board[10][9] = 1
         b.board[10][10] = 1
@@ -42,7 +42,7 @@ class TestStringMethods(unittest.TestCase):
     def test_board_move_with_rotations(self):
         b = bg.Board()
         b.moves_count = 3
-        player = bg.Player('Name', 1)
+        player = bg.Player("Name", 1)
         b.board[9][7] = 1
         b.board[9][8] = 1
         b.board[9][9] = 2
@@ -70,7 +70,7 @@ class TestStringMethods(unittest.TestCase):
     def test_board_move_allowed_with_rotations2(self):
         b = bg.Board()
         b.moves_count = 3
-        player = bg.Player('Name', 1)
+        player = bg.Player("Name", 1)
         b.board[6][8] = 1
         b.board[7][8] = 1
         b.board[7][9] = 1
@@ -98,7 +98,7 @@ class TestStringMethods(unittest.TestCase):
     def test_board_move_allowed_rotation3(self):
         b = bg.Board()
         b.moves_count = 3
-        player = bg.Player('Name', 1)
+        player = bg.Player("Name", 1)
         b.board[6][8] = 1
         b.board[7][8] = 1
         b.board[8][8] = 1
@@ -126,7 +126,7 @@ class TestStringMethods(unittest.TestCase):
     def test_board_move_not_allowed_touching_side(self):
         b = bg.Board()
         b.moves_count = 3
-        player = bg.Player('Name', 1)
+        player = bg.Player("Name", 1)
         b.board[0][2] = 1
         b.board[1][0] = 1
         b.board[1][1] = 1

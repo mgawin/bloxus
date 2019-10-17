@@ -1,0 +1,4 @@
+{
+  "bloxus_lib/test/test_board.py": true,
+  "bloxus_lib/test/test_game.py": true
+}

@@ -14,11 +14,10 @@ import ast
 def init(request):
     if not _verify_request_params(request, ["name"], "POST"):
         return HttpResponseBadRequest()
-    name = request.POST.get('name')
-    if request.POST.get('auto') is not None:
+    name = request.POST.get("name")
+    if request.POST.get("auto") is not None:
         player = bg.Player(name, 1)
-        robot_player = bg.Player(
-            "Robot", 2, strat.random_bvalue_strategy_with_rotates)
+        robot_player = bg.Player("Robot", 2, strat.random_bvalue_strategy_with_rotates)
         game = bg.Game(player, robot_player)
         ser_game = Game()
         ser_game.id = game.id
@@ -49,27 +48,31 @@ def init(request):
                 wg.save()
                 ser_game.persisted_game = dill.dumps(game).hex()
                 ser_game.save()
-    return JsonResponse({"gid": gid, "status": game.state, "player": player.input_for_JSON()})
+    return JsonResponse(
+        {"gid": gid, "status": game.state, "player": player.input_for_JSON()}
+    )
 
 
 @csrf_exempt
 def get(request):
     if not _verify_request_params(request, ["gid"], "GET"):
         return HttpResponseBadRequest()
-    gid = request.GET.get('gid')
+    gid = request.GET.get("gid")
     ser_game = get_object_or_404(Game, pk=gid)
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
-    return JsonResponse({"status": game.state})
+    return JsonResponse(
+        {"status": game.state, "result": game.get_game_result_for_JSON()}
+    )
 
 
 @csrf_exempt
 def check_move(request):
     if not _verify_request_params(request, ["gid", "pid", "mov"], "POST"):
         return HttpResponseBadRequest()
-    gid = request.POST.get('gid')
+    gid = request.POST.get("gid")
     ser_game = get_object_or_404(Game, pk=gid)
-    pid = request.POST.get('pid')
-    move = ast.literal_eval(request.POST.get('mov'))
+    pid = request.POST.get("pid")
+    move = ast.literal_eval(request.POST.get("mov"))
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
     res = game.is_allowed(game.get_player(int(pid)), move)
     return JsonResponse({"allowed": res})
@@ -79,11 +82,11 @@ def check_move(request):
 def move(request):
     if not _verify_request_params(request, ["gid", "pid", "mov"], "POST"):
         return HttpResponseBadRequest()
-    gid = request.POST.get('gid')
+    gid = request.POST.get("gid")
     ser_game = get_object_or_404(Game, pk=gid)
-    pid = request.POST.get('pid')
-    move = ast.literal_eval(request.POST.get('mov'))
-    if move['id'] is None:
+    pid = request.POST.get("pid")
+    move = ast.literal_eval(request.POST.get("mov"))
+    if move["id"] is None:
         move = None
 
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
@@ -104,36 +107,43 @@ def move(request):
     ser_game.persisted_game = dill.dumps(game).hex()
     time.sleep(0)
     ser_game.save()
-    result = {}
-    if game.state is bg.GameState.FINISHED:
-        result = game.get_game_result_for_JSON()
-    return JsonResponse({"status": game.state, "board": game.board.input_for_JSON(), "last": last_move,
-                         "result": result})
+
+    return JsonResponse(
+        {
+            "status": game.state,
+            "board": game.board.input_for_JSON(),
+            "last": last_move,
+            "result": game.get_game_result_for_JSON(),
+        }
+    )
 
 
 @csrf_exempt
 def get_available_moves(request):
-    if not _verify_request_params(request, ["gid", "pid", "bid", "rotates", "flip"], "POST"):
+    if not _verify_request_params(
+        request, ["gid", "pid", "bid", "rotates", "flip"], "POST"
+    ):
         return HttpResponseBadRequest()
-    gid = request.POST.get('gid')
+    gid = request.POST.get("gid")
     ser_game = get_object_or_404(Game, pk=gid)
-    pid = request.POST.get('pid')
-    bid = request.POST.get('bid')
-    flip = request.POST.get('flip')
-    rotates = request.POST.get('rotates')
+    pid = request.POST.get("pid")
+    bid = request.POST.get("bid")
+    flip = request.POST.get("flip")
+    rotates = request.POST.get("rotates")
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
 
-    moves = game.board.get_available_moves(game.get_player(
-        int(pid)).get_blox(int(bid)), int(rotates), int(flip))
+    moves = game.board.get_available_moves(
+        game.get_player(int(pid)).get_blox(int(bid)), int(rotates), int(flip)
+    )
     return JsonResponse({"moves": moves})
 
 
 def _verify_request_params(request, params, method):
     if request.method != method:
         return False
-    if method == 'POST':
+    if method == "POST":
         data = request.POST
-    elif method == 'GET':
+    elif method == "GET":
         data = request.GET
     for param in params:
         if param not in data:
