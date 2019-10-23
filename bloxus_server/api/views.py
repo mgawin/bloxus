@@ -7,7 +7,40 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 import time
+import datetime
 import ast
+from django.utils import timezone
+
+
+def _get_game(name):
+    with transaction.atomic():
+        if WaitingGame.objects.count() > 0:
+            wg = WaitingGame.objects.earliest("created")
+            ser_game = get_object_or_404(Game, pk=wg.gid)
+            now = timezone.now()
+            if (now - ser_game.last_active).total_seconds() < 10:
+                game = dill.loads(bytes.fromhex(ser_game.persisted_game))
+                player = bg.Player(name, 2)
+                game.add_player(player)
+                ser_game.persisted_game = dill.dumps(game).hex()
+                ser_game.save()
+                wg.delete()
+                return game.id, game.state, player.input_for_JSON()
+            else:
+                wg.delete()
+                return _get_game(name)
+
+        else:
+            player = bg.Player(name, 1)
+            game = bg.Game(player)
+            wg = WaitingGame()
+            wg.gid = game.id
+            wg.save()
+            ser_game = Game()
+            ser_game.id = game.id
+            ser_game.persisted_game = dill.dumps(game).hex()
+            ser_game.save()
+            return game.id, game.state, player.input_for_JSON()
 
 
 @csrf_exempt
@@ -27,31 +60,8 @@ def init(request):
         ser_game.save()
 
     else:
-        with transaction.atomic():
-            wg = WaitingGame.objects.select_for_update().get()
-            if wg.gid == "0000":
-                player = bg.Player(name, 1)
-                game = bg.Game(player)
-                wg.gid = game.id
-                gid = game.id
-                wg.save()
-                ser_game = Game()
-                ser_game.id = game.id
-                ser_game.persisted_game = dill.dumps(game).hex()
-                ser_game.save()
-            else:
-                ser_game = get_object_or_404(Game, pk=wg.gid)
-                game = dill.loads(bytes.fromhex(ser_game.persisted_game))
-                player = bg.Player(name, 2)
-                game.add_player(player)
-                gid = wg.gid
-                wg.gid = "0000"
-                wg.save()
-                ser_game.persisted_game = dill.dumps(game).hex()
-                ser_game.save()
-    return JsonResponse(
-        {"gid": gid, "status": game.state, "player": player.input_for_JSON()}
-    )
+        gid, state, player = _get_game(name)
+    return JsonResponse({"gid": gid, "status": state, "player": player})
 
 
 @csrf_exempt
@@ -62,6 +72,8 @@ def get(request):
     ser_game = get_object_or_404(Game, pk=gid)
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
     last_move = game.get_last_move()
+    ser_game.last_active = datetime.datetime.now()
+    ser_game.save()
     return JsonResponse(
         {
             "status": game.state,
