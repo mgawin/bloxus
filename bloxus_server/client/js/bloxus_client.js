@@ -12,6 +12,14 @@ app.controller('GameController', ['backendService', '$scope', '$mdToast', '$mdDi
 
     $scope.state = '0';
     $scope.playerId = data.player.pid;
+    if ($scope.playerId == 1) {
+      $scope.color = 'orange';
+      $scope.opponent_color = '#B164DE';
+    } else {
+      $scope.opponent_color = 'orange';
+      $scope.color = '#B164DE';
+
+    }
     $scope.blocks = data.player.bloxs;
     $scope.setStatus(data.status);
 
@@ -177,7 +185,7 @@ app.controller('GameController', ['backendService', '$scope', '$mdToast', '$mdDi
             $scope.showMessage($scope.message);
             // $scope.showAlert();
             if (last != null) {
-              $scope.drawMove(last, 'orange');
+              $scope.drawMove(last, $scope.opponent_color);
             }
 
           }
@@ -196,7 +204,7 @@ app.controller('GameController', ['backendService', '$scope', '$mdToast', '$mdDi
             $scope.message = "Your turn!";
             $scope.showMessage($scope.message);
             if (last != null) {
-              $scope.drawMove(last, 'orange');
+              $scope.drawMove(last, $scope.opponent_color);
             }
 
           }
@@ -230,7 +238,7 @@ app.controller('GameController', ['backendService', '$scope', '$mdToast', '$mdDi
     backendService.doMove($scope.gameId, $scope.playerId, $scope.selected.bid, $scope.selected.orientation_id, $scope.selected.flipped, x, y).then(function (data) {
       console.log(data.last);
       if (data.last != '') {
-        $scope.drawMove(data.last, '#B164DE');
+        $scope.drawMove(data.last, $scope.opponent_color);
       }
       $scope.setStatus(data.status, data.result, data.last);
 
@@ -250,7 +258,7 @@ app.controller('GameController', ['backendService', '$scope', '$mdToast', '$mdDi
 
     backendService.doMove($scope.gameId, $scope.playerId, 'None', 'None', 'None', 'None', 'None').then(function (data) {
       if (!(Object.keys(data.last).length === 0 && data.last.constructor === Object)) {
-        $scope.drawMove(data.last, '#B164DE');
+        $scope.drawMove(data.last, $scope.opponent_color);
       }
       $scope.setStatus(data.status, data.result, data.last);
 
@@ -321,8 +329,7 @@ app.controller('GameController', ['backendService', '$scope', '$mdToast', '$mdDi
     var y = 3 * grid;
     var x = 450;
     var color;
-    if ($scope.playerId == 1) color = 'orange';
-    else color = '#B164DE';
+    color = $scope.color;
 
     $scope.blocks.forEach(function (element, index) {
       x = x + 120;
