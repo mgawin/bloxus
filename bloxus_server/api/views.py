@@ -12,43 +12,8 @@ import ast
 from django.utils import timezone
 
 
-def _get_game(name):
-    with transaction.atomic():
-        if WaitingGame.objects.count() > 0:
-            wg = WaitingGame.objects.earliest("created")
-            ser_game = get_object_or_404(Game, pk=wg.gid)
-            now = timezone.now()
-            if (now - ser_game.last_active).total_seconds() < 10:
-                game = dill.loads(bytes.fromhex(ser_game.persisted_game))
-                player = bg.Player(name, 2)
-                game.add_player(player)
-                ser_game.persisted_game = dill.dumps(game).hex()
-                ser_game.save()
-                wg.delete()
-                return game.id, game.state, player.input_for_JSON()
-            else:
-                wg.delete()
-                return _get_game(name)
-
-        else:
-            player = bg.Player(name, 1)
-            game = bg.Game(player)
-            wg = WaitingGame()
-            wg.gid = game.id
-            wg.save()
-            ser_game = Game()
-            ser_game.id = game.id
-            ser_game.persisted_game = dill.dumps(game).hex()
-            ser_game.save()
-            return game.id, game.state, player.input_for_JSON()
-
-
-@csrf_exempt
-def init(request):
-    if not _verify_request_params(request, ["name"], "POST"):
-        return HttpResponseBadRequest()
-    name = request.POST.get("name")
-    if request.POST.get("auto") is not None:
+def _get_game(name, autogame=False):
+    if autogame:
         player = bg.Player(name, 1)
         robot_player = bg.Player("Robot", 2, strat.random_bvalue_strategy_with_rotates)
         game = bg.Game(player, robot_player)
@@ -58,7 +23,45 @@ def init(request):
         gid = game.id
         ser_game.persisted_game = dill.dumps(game).hex()
         ser_game.save()
+        return game.id, game.state, player.input_for_JSON()
+    else:
+        with transaction.atomic():
+            if WaitingGame.objects.count() > 0:
+                wg = WaitingGame.objects.earliest("created")
+                ser_game = get_object_or_404(Game, pk=wg.gid)
+                now = timezone.now()
+                if (now - ser_game.last_active).total_seconds() < 10:
+                    game = dill.loads(bytes.fromhex(ser_game.persisted_game))
+                    player = bg.Player(name, 2)
+                    game.add_player(player)
+                    ser_game.persisted_game = dill.dumps(game).hex()
+                    ser_game.save()
+                    wg.delete()
+                    return game.id, game.state, player.input_for_JSON()
+                else:
+                    wg.delete()
+                    return _get_game(name)
 
+            else:
+                player = bg.Player(name, 1)
+                game = bg.Game(player)
+                wg = WaitingGame()
+                wg.gid = game.id
+                wg.save()
+                ser_game = Game()
+                ser_game.id = game.id
+                ser_game.persisted_game = dill.dumps(game).hex()
+                ser_game.save()
+                return game.id, game.state, player.input_for_JSON()
+
+
+@csrf_exempt
+def init(request):
+    if not _verify_request_params(request, ["name"], "POST"):
+        return HttpResponseBadRequest()
+    name = request.POST.get("name")
+    if request.POST.get("auto") is not None:
+        gid, state, player = _get_game(name, autogame=True)
     else:
         gid, state, player = _get_game(name)
     return JsonResponse({"gid": gid, "status": state, "player": player})
