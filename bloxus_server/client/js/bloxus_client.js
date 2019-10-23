@@ -108,7 +108,7 @@ app.controller('GameController', ['backendService', '$scope', '$mdToast', '$mdDi
 
     promise.then(function (successResponse) {
       console.log("Got game status code: " + successResponse.data.status);
-      $scope.setStatus(successResponse.data.status, successResponse.data.result);
+      $scope.setStatus(successResponse.data.status, successResponse.data.result, successResponse.data.last);
 
 
 
@@ -157,7 +157,7 @@ app.controller('GameController', ['backendService', '$scope', '$mdToast', '$mdDi
   }
 
 
-  $scope.setStatus = function (status, result) {
+  $scope.setStatus = function (status, result, last) {
 
     if ($scope.state != status) {
       console.log("changing status");
@@ -176,7 +176,9 @@ app.controller('GameController', ['backendService', '$scope', '$mdToast', '$mdDi
             $scope.message = "Your turn!"
             $scope.showMessage($scope.message);
             // $scope.showAlert();
-            //  $scope.drawMove(successResponse.data.last, '#B164DE');
+            if (last != null) {
+              $scope.drawMove(last, 'orange');
+            }
 
           }
           else {
@@ -193,7 +195,9 @@ app.controller('GameController', ['backendService', '$scope', '$mdToast', '$mdDi
             $scope.blocked = false;
             $scope.message = "Your turn!";
             $scope.showMessage($scope.message);
-            //  $scope.drawMove(successResponse.data.last, 'orange');
+            if (last != null) {
+              $scope.drawMove(last, 'orange');
+            }
 
           }
           else {
@@ -225,10 +229,10 @@ app.controller('GameController', ['backendService', '$scope', '$mdToast', '$mdDi
     if ($scope.blocked) return;
     backendService.doMove($scope.gameId, $scope.playerId, $scope.selected.bid, $scope.selected.orientation_id, $scope.selected.flipped, x, y).then(function (data) {
       console.log(data.last);
-      if (!(Object.keys(data.last).length === 0 && data.last.constructor === Object)) {
+      if (data.last != '') {
         $scope.drawMove(data.last, '#B164DE');
       }
-      $scope.setStatus(data.status, data.result);
+      $scope.setStatus(data.status, data.result, data.last);
 
     })
     console.log("moved");
@@ -248,7 +252,7 @@ app.controller('GameController', ['backendService', '$scope', '$mdToast', '$mdDi
       if (!(Object.keys(data.last).length === 0 && data.last.constructor === Object)) {
         $scope.drawMove(data.last, '#B164DE');
       }
-      $scope.setStatus(data.status, data.result);
+      $scope.setStatus(data.status, data.result, data.last);
 
     })
     $scope.blocked = true;

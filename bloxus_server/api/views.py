@@ -25,9 +25,10 @@ def init(request):
         gid = game.id
         ser_game.persisted_game = dill.dumps(game).hex()
         ser_game.save()
+
     else:
         with transaction.atomic():
-            wg = WaitingGame.objects.select_for_update().get(id=1)
+            wg = WaitingGame.objects.select_for_update().get()
             if wg.gid == "0000":
                 player = bg.Player(name, 1)
                 game = bg.Game(player)
@@ -60,8 +61,13 @@ def get(request):
     gid = request.GET.get("gid")
     ser_game = get_object_or_404(Game, pk=gid)
     game = dill.loads(bytes.fromhex(ser_game.persisted_game))
+    last_move = game.get_last_move()
     return JsonResponse(
-        {"status": game.state, "result": game.get_game_result_for_JSON()}
+        {
+            "status": game.state,
+            "result": game.get_game_result_for_JSON(),
+            "last": last_move,
+        }
     )
 
 
@@ -98,12 +104,14 @@ def move(request):
     except RuntimeError as e:
         print(str(e))
         return HttpResponseBadRequest()
+    last_move = ""
     if ser_game.robot_game:
         try:
             game.move(game.get_player(2))
             last_move = game.get_last_move()
         except RuntimeError:
             return HttpResponseBadRequest()
+
     ser_game.persisted_game = dill.dumps(game).hex()
     time.sleep(0)
     ser_game.save()

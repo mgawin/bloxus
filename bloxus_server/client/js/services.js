@@ -13,7 +13,7 @@ app.factory('backendService', ['$http', '$interval', '$timeout', function ($http
       host_url = 'http://' + location.host;
       data = new URLSearchParams();
       data.set('name', 'Maciej');
-      data.set('auto', '');
+      // data.set('auto', '');
       url = host_url + '/api/init/';
       var promise = $http.post(url, data.toString(), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).then(function (response) {
         return response.data;

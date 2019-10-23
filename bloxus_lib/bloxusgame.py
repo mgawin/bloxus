@@ -44,7 +44,7 @@ class Game:
 
     def get_last_move(self):
         last_move = {}
-        if self.move_history[0] is not None:
+        if len(self.move_history) > 0:
             if self.move_history[0]["blox"] != "":
                 last_move["blox"] = self.move_history[0]["blox"].input_for_JSON()
                 last_move["pid"] = self.move_history[0]["player_id"]
